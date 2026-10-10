@@ -1,0 +1,30 @@
+{
+  "name": "movie-buffs-rabbit-hole",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Movie Buff's Rabbit Hole — A Chrome extension for cinephiles: says vs means frame analysis, quirky summaries, director's cut, themes, and ambient soundtracks.",
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/build.mjs --watch --mode development",
+    "build": "npm run typecheck && node scripts/build.mjs",
+    "build:only": "node scripts/build.mjs",
+    "typecheck": "tsc --noEmit",
+    "icons": "node scripts/generate-icons.mjs"
+  },
+  "engines": {
+    "node": ">=20.12"
+  },
+  "dependencies": {
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.3.4",
+    "@types/node": "^26.6.4",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@vitejs/plugin-react": "^6.1.2",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.3"
+  }
+}

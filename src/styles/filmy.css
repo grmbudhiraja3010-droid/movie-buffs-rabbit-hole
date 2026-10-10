@@ -1,0 +1,853 @@
+/* ==========================================================================
+   Movie Buff's Rabbit Hole — Filmy Cinematic Stylesheet
+   ========================================================================== */
+
+:root {
+  --font-serif: 'Cinzel', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+
+  /* Cinema Palette */
+  --noir-950: #07090e;
+  --noir-900: #0c0f17;
+  --noir-850: #121622;
+  --noir-800: #181d2c;
+  --noir-700: #232a3e;
+  --noir-600: #333d59;
+
+  --gold-500: #f59e0b;
+  --gold-400: #fbbf24;
+  --crimson-500: #e11d48;
+  --crimson-600: #be123c;
+  --amber-warm: #d97706;
+  --cyan-lens: #06b6d4;
+
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 28px;
+
+  --shadow-cinema: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.08);
+  --shadow-glow: 0 0 25px rgba(225, 29, 72, 0.25);
+  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body.filmy-body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background-color: var(--noir-950);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-x: hidden;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Chrome Extension popup dimensions */
+#root {
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* ── Film Grain & Cinematic Projection Atmosphere ─────────────────────── */
+.filmy-atmosphere {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  opacity: 0.045;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+.projector-glow {
+  position: fixed;
+  top: -150px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(225, 29, 72, 0.08) 45%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+  filter: blur(40px);
+}
+
+.ambient-dust-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
+              radial-gradient(circle at 10% 80%, rgba(225, 29, 72, 0.08) 0%, transparent 60%);
+  z-index: 1;
+}
+
+/* ── Layout & Rabbit Hole Shell ────────────────────────────────────────── */
+.app-container {
+  position: relative;
+  z-index: 10;
+  max-width: 780px;
+  margin: 0 auto;
+  padding: 16px 18px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* For standalone tab dashboard mode */
+.tab-mode-container {
+  max-width: 1080px;
+  padding: 24px 32px 64px;
+}
+
+/* ── Cinematic Top Bar ─────────────────────────────────────────────────── */
+.cinema-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 18px;
+  background: rgba(18, 22, 34, 0.75);
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-cinema);
+}
+
+.brand-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.film-reel-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--crimson-500), var(--gold-500));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
+  font-size: 18px;
+}
+
+.brand-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  background: linear-gradient(to right, #ffffff, #fef08a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* ── Audio Soundtrack Controller Bar ──────────────────────────────────── */
+.audio-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px;
+  background: linear-gradient(90deg, rgba(24, 29, 44, 0.95), rgba(35, 42, 62, 0.85));
+  border: 1px solid rgba(245, 158, 11, 0.2);
+  border-radius: var(--radius-md);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+  gap: 14px;
+}
+
+.audio-track-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.equalizer-anim {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 16px;
+  width: 18px;
+}
+
+.equalizer-bar {
+  width: 3px;
+  background: var(--gold-400);
+  border-radius: 2px;
+  animation: eqBounce 1.2s ease-in-out infinite alternate;
+}
+
+.equalizer-bar:nth-child(2) {
+  animation-delay: 0.3s;
+  background: var(--crimson-500);
+}
+
+.equalizer-bar:nth-child(3) {
+  animation-delay: 0.6s;
+  background: var(--gold-400);
+}
+
+@keyframes eqBounce {
+  0% { height: 4px; }
+  100% { height: 16px; }
+}
+
+.track-names {
+  min-width: 0;
+}
+
+.track-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.track-composer {
+  font-size: 10px;
+  color: var(--gold-400);
+}
+
+.audio-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.audio-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: none;
+  color: #fff;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.audio-btn:hover {
+  background: var(--crimson-500);
+  transform: scale(1.05);
+}
+
+.volume-slider-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.volume-slider {
+  width: 65px;
+  accent-color: var(--gold-400);
+  cursor: pointer;
+}
+
+/* ── Rabbit Hole Depth Meter ─────────────────────────────────────────── */
+.depth-meter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 16px;
+  background: rgba(12, 15, 23, 0.85);
+  border-radius: var(--radius-sm);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.depth-steps {
+  display: flex;
+  gap: 6px;
+}
+
+.depth-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  transition: var(--transition-smooth);
+}
+
+.depth-dot.active {
+  background: var(--gold-400);
+  box-shadow: 0 0 8px var(--gold-400);
+}
+
+/* ── Movie Hero / Playing Banner ──────────────────────────────────────── */
+.movie-hero {
+  position: relative;
+  background: linear-gradient(180deg, rgba(24, 29, 44, 0.85) 0%, rgba(12, 15, 23, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  box-shadow: var(--shadow-cinema);
+  overflow: hidden;
+}
+
+.filmstrip-border-top {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 6px;
+  background: repeating-linear-gradient(90deg, #333d59, #333d59 12px, transparent 12px, transparent 18px);
+  opacity: 0.35;
+}
+
+.hero-main-row {
+  display: flex;
+  gap: 20px;
+}
+
+.movie-poster-box {
+  width: 110px;
+  height: 160px;
+  flex-shrink: 0;
+  border-radius: var(--radius-md);
+  background: linear-gradient(135deg, #1e293b, #0f172a);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  text-align: center;
+  padding: 12px;
+}
+
+.hero-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.watching-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: rgba(225, 29, 72, 0.15);
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  border-radius: 99px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fb7185;
+  width: fit-content;
+}
+
+.pulse-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--crimson-500);
+  box-shadow: 0 0 8px var(--crimson-500);
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.8); }
+}
+
+.movie-title {
+  font-family: var(--font-serif);
+  font-size: 26px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.2;
+}
+
+.movie-meta-line {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.meta-pill {
+  color: #cbd5e1;
+}
+
+.meta-director strong {
+  color: var(--gold-400);
+}
+
+.movie-synopsis {
+  font-size: 13px;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin-top: 4px;
+}
+
+.ratings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.rating-chip {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rating-chip .score {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.rating-chip.rt .score { color: #f87171; }
+.rating-chip.imdb .score { color: var(--gold-400); }
+.rating-chip.special .score { color: var(--cyan-lens); }
+
+/* ── Search Switcher ─────────────────────────────────────────────────── */
+.search-movie-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.search-input {
+  flex: 1;
+  background: rgba(7, 9, 14, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  color: #fff;
+  font-size: 13px;
+  font-family: var(--font-sans);
+  outline: none;
+  transition: var(--transition-smooth);
+}
+
+.search-input:focus {
+  border-color: var(--gold-400);
+  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+}
+
+.search-btn {
+  background: linear-gradient(135deg, var(--crimson-500), var(--amber-warm));
+  border: none;
+  color: #fff;
+  font-weight: 600;
+  padding: 0 16px;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-size: 13px;
+  transition: var(--transition-smooth);
+}
+
+.search-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* ── Quirky Reddit Summary ────────────────────────────────────────────── */
+.quirky-banner {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(225, 29, 72, 0.08));
+  border: 1px solid rgba(245, 158, 11, 0.25);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+}
+
+.quirky-icon {
+  font-size: 24px;
+}
+
+.quirky-content {
+  flex: 1;
+}
+
+.quirky-header {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--gold-400);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.quirky-quote {
+  font-style: italic;
+  font-size: 14px;
+  color: #f1f5f9;
+  line-height: 1.45;
+  margin-bottom: 6px;
+}
+
+.quirky-takeaway {
+  font-size: 12px;
+  color: #cbd5e1;
+}
+
+/* ── Rabbit Hole Cards & Expandable Accordions ────────────────────────── */
+.rabbit-section {
+  background: rgba(18, 22, 34, 0.75);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  transition: var(--transition-smooth);
+}
+
+.rabbit-section:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.section-trigger {
+  width: 100%;
+  padding: 16px 20px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  text-align: left;
+}
+
+.section-trigger-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.section-icon {
+  font-size: 18px;
+}
+
+.section-heading {
+  font-family: var(--font-serif);
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.section-badge {
+  font-size: 11px;
+  padding: 2px 8px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 99px;
+  color: var(--gold-400);
+  font-family: var(--font-sans);
+}
+
+.section-body {
+  padding: 0 20px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+/* ── Frame Analysis: Says vs Means ────────────────────────────────────── */
+.frame-card {
+  background: rgba(12, 15, 23, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.frame-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.frame-title {
+  font-weight: 600;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.frame-time {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--gold-400);
+  background: rgba(245, 158, 11, 0.12);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.says-means-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 600px) {
+  .says-means-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.says-box {
+  background: rgba(255, 255, 255, 0.03);
+  border-left: 3px solid #64748b;
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.means-box {
+  background: rgba(225, 29, 72, 0.06);
+  border-left: 3px solid var(--crimson-500);
+  border-radius: 4px;
+  padding: 10px 12px;
+}
+
+.sub-label {
+  font-size: 10px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+  display: block;
+}
+
+.says-box .sub-label { color: #94a3b8; }
+.means-box .sub-label { color: #fb7185; }
+
+.frame-text {
+  font-size: 12.5px;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+
+.palette-bar {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.color-swatch {
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+/* ── Reviews Card (Critics vs Normal + Filters) ───────────────────────── */
+.review-filters {
+  display: flex;
+  gap: 8px;
+  margin: 14px 0 12px;
+  flex-wrap: wrap;
+}
+
+.filter-pill {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  padding: 4px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.filter-pill:hover, .filter-pill.active {
+  background: var(--gold-400);
+  color: #000;
+  font-weight: 600;
+  border-color: var(--gold-400);
+}
+
+.review-card {
+  background: rgba(12, 15, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 8px;
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.reviewer-name {
+  font-weight: 600;
+  font-size: 13px;
+  color: #fff;
+}
+
+.review-stars {
+  color: var(--gold-400);
+  font-size: 12px;
+}
+
+.review-quote {
+  font-size: 13px;
+  color: #cbd5e1;
+  line-height: 1.45;
+  font-style: italic;
+}
+
+/* ── Cast & Interviews ────────────────────────────────────────────────── */
+.cast-item {
+  background: rgba(12, 15, 23, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  margin-top: 10px;
+}
+
+.cast-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.cast-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.cast-char {
+  font-size: 12px;
+  color: var(--text-secondary);
+}
+
+.filmography-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 8px 0;
+}
+
+.filmo-chip {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  color: #e2e8f0;
+}
+
+.filmo-chip.best {
+  border-left: 2px solid var(--gold-400);
+}
+
+/* ── Genre & Country Table ────────────────────────────────────────────── */
+.genre-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+
+.genre-table th, .genre-table td {
+  padding: 8px 12px;
+  text-align: left;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  font-size: 12.5px;
+}
+
+.genre-table th {
+  color: var(--gold-400);
+  font-weight: 600;
+  text-transform: uppercase;
+  font-size: 11px;
+}
+
+/* ── Thematic Topics ──────────────────────────────────────────────────── */
+.topic-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.topic-tag {
+  background: rgba(6, 182, 212, 0.12);
+  border: 1px solid rgba(6, 182, 212, 0.3);
+  color: #67e8f9;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.topic-tag:hover, .topic-tag.active {
+  background: var(--cyan-lens);
+  color: #000;
+  font-weight: 600;
+}
+
+/* ── Opposite Movies & Similar ────────────────────────────────────────── */
+.contrast-card {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(12, 15, 23, 0.9));
+  border: 1px solid rgba(225, 29, 72, 0.3);
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+  margin-top: 10px;
+}
+
+.contrast-title {
+  color: #fb7185;
+  font-weight: 700;
+  font-size: 13.5px;
+}
+
+/* ── External Links (Reddit / Substack / Goodreads) ────────────────────── */
+.link-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: var(--radius-sm);
+  margin-top: 6px;
+  text-decoration: none;
+  color: #e2e8f0;
+  font-size: 13px;
+  transition: var(--transition-smooth);
+}
+
+.link-row:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--gold-400);
+}
