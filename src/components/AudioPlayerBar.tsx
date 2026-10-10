@@ -1,95 +1,117 @@
 import React, { useEffect, useState } from 'react';
-import { audioEngine } from '../services/audioService';
+import { audioClient, type AudioState } from '../services/audioService';
 import type { SoundtrackTrack } from '../types/movie';
 
 interface AudioPlayerBarProps {
-  tracks: SoundtrackTrack[];
+  initialTracks: SoundtrackTrack[];
 }
 
-export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({ tracks }) => {
-  const [activeIdx, setActiveIdx] = useState(0);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [volume, setVolume] = useState(0.45);
-  const [isMuted, setIsMuted] = useState(false);
-
-  const currentTrack = tracks[activeIdx] || tracks[0];
+export const AudioPlayerBar: React.FC<AudioPlayerBarProps> = ({ initialTracks }) => {
+  const [audioState, setAudioState] = useState<AudioState>(audioClient.getState());
 
   useEffect(() => {
-    const unsub = audioEngine.subscribe((state) => {
-      setIsPlaying(state.isPlaying);
-      setVolume(state.volume);
-      setIsMuted(state.isMuted);
+    audioClient.setInitialSongs(initialTracks);
+    const unsub = audioClient.subscribe((state) => {
+      setAudioState(state);
     });
     return unsub;
-  }, []);
+  }, [initialTracks]);
 
-  const handlePlayToggle = () => {
-    if (currentTrack) {
-      audioEngine.togglePlay(currentTrack.audioPreset);
-    }
-  };
-
-  const handleNextTrack = () => {
-    const next = (activeIdx + 1) % tracks.length;
-    setActiveIdx(next);
-    if (isPlaying) {
-      audioEngine.playPreset(tracks[next].audioPreset);
+  const handleSelectSong = (song: SoundtrackTrack) => {
+    if (audioState.isPlaying && audioState.currentSong?.id === song.id) {
+      audioClient.stop();
+    } else {
+      audioClient.selectAndPlaySong(song);
     }
   };
 
   const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
-    audioEngine.setVolume(val);
+    audioClient.setVolume(val);
   };
 
+  const currentSong = audioState.currentSong;
+
   return (
-    <div className="audio-bar">
-      <div className="audio-track-info">
-        <div className="equalizer-anim" style={{ opacity: isPlaying ? 1 : 0.3 }}>
-          <div className="equalizer-bar" style={{ animationPlayState: isPlaying ? 'running' : 'paused' }} />
-          <div className="equalizer-bar" style={{ animationPlayState: isPlaying ? 'running' : 'paused' }} />
-          <div className="equalizer-bar" style={{ animationPlayState: isPlaying ? 'running' : 'paused' }} />
+    <div className="audio-bar-card">
+      <div className="audio-header-row">
+        <div className="audio-current-info">
+          <div className="equalizer-anim" style={{ opacity: audioState.isPlaying ? 1 : 0.4 }}>
+            <div className="equalizer-bar" style={{ animationPlayState: audioState.isPlaying ? 'running' : 'paused' }} />
+            <div className="equalizer-bar" style={{ animationPlayState: audioState.isPlaying ? 'running' : 'paused' }} />
+            <div className="equalizer-bar" style={{ animationPlayState: audioState.isPlaying ? 'running' : 'paused' }} />
+          </div>
+          <div>
+            <div className="audio-status-label">
+              {audioState.isPlaying ? '🎧 Playing Side-by-Side with Movie' : '🎵 Ambient Soundtrack (Paused)'}
+            </div>
+            <div className="track-title-main">
+              {currentSong ? `${currentSong.title} — ${currentSong.composer}` : 'Select a matching soundtrack below'}
+            </div>
+          </div>
         </div>
-        <div className="track-names">
-          <div className="track-title">{currentTrack?.title || 'Ambient Score'}</div>
-          <div className="track-composer">
-            {currentTrack?.composer} • {currentTrack?.mood}
+
+        <div className="audio-slider-controls">
+          <button
+            className="audio-circle-btn"
+            onClick={() => audioClient.togglePlay()}
+            title={audioState.isPlaying ? 'Pause background song' : 'Play soundtrack'}
+          >
+            {audioState.isPlaying ? '⏸' : '▶'}
+          </button>
+
+          <div className="volume-wrap">
+            <span style={{ fontSize: '12px' }}>🔊</span>
+            <input
+              type="range"
+              min="0"
+              max="1"
+              step="0.02"
+              value={audioState.volume}
+              onChange={handleVolumeChange}
+              className="volume-slider"
+              title={`Volume: ${Math.round(audioState.volume * 100)}%`}
+            />
+            <span style={{ fontSize: '11px', color: '#64748b', minWidth: '28px' }}>
+              {Math.round(audioState.volume * 100)}%
+            </span>
           </div>
         </div>
       </div>
 
-      <div className="audio-controls">
-        <button
-          className="audio-btn"
-          onClick={handlePlayToggle}
-          title={isPlaying ? 'Pause background soundtrack' : 'Play background soundtrack while watching'}
-        >
-          {isPlaying ? '⏸' : '▶'}
-        </button>
+      {/* Exactly 2 Semantic Song Suggestions */}
+      <div className="song-suggestions-wrapper">
+        <div className="suggestions-badge-label">
+          ✨ Semantically Matching Songs (2 Suggestions — click to play & update similar):
+        </div>
 
-        <button className="audio-btn" onClick={handleNextTrack} title="Next ambient track">
-          ⏭
-        </button>
+        <div className="suggestions-grid">
+          {audioState.suggestions.map((song) => {
+            const isThisPlaying = audioState.isPlaying && audioState.currentSong?.id === song.id;
 
-        <div className="volume-slider-wrap">
-          <button
-            className="audio-btn"
-            style={{ width: '26px', height: '26px', fontSize: '11px' }}
-            onClick={() => audioEngine.toggleMute()}
-            title={isMuted ? 'Unmute' : 'Mute'}
-          >
-            {isMuted ? '🔇' : '🔊'}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.01"
-            value={isMuted ? 0 : volume}
-            onChange={handleVolumeChange}
-            className="volume-slider"
-            title={`Volume: ${Math.round((isMuted ? 0 : volume) * 100)}%`}
-          />
+            return (
+              <div
+                key={song.id}
+                className={`song-card-item ${isThisPlaying ? 'active-playing' : ''}`}
+                onClick={() => handleSelectSong(song)}
+              >
+                <div className="song-item-left">
+                  <div className="song-play-icon">
+                    {isThisPlaying ? '🔊' : '▶'}
+                  </div>
+                  <div>
+                    <div className="song-item-title">{song.title}</div>
+                    <div className="song-item-artist">{song.composer}</div>
+                    <div className="song-item-mood">{song.mood}</div>
+                  </div>
+                </div>
+
+                <button className={`song-action-pill ${isThisPlaying ? 'playing' : ''}`}>
+                  {isThisPlaying ? 'Playing' : 'Listen'}
+                </button>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

@@ -135,34 +135,42 @@ export const CastRabbitHole: React.FC<CastRabbitHoleProps> = ({ cast }) => {
 
             <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
               {filteredInterviews.length === 0 ? (
-                <div style={{ fontSize: '12px', color: '#94a3b8' }}>No interviews under this category.</div>
+                <div style={{ fontSize: '12px', color: 'var(--text-muted)' }}>No interviews under this category.</div>
               ) : (
                 filteredInterviews.map((interview) => (
-                  <div
+                  <a
                     key={interview.id}
+                    href={interview.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     style={{
-                      background: 'rgba(255, 255, 255, 0.02)',
-                      padding: '8px 10px',
-                      borderRadius: '6px',
+                      display: 'block',
+                      background: '#f8fafc',
+                      padding: '10px 12px',
+                      borderRadius: '8px',
+                      border: '1px solid var(--border-light)',
                       borderLeft: `3px solid ${
                         interview.category === 'controversial'
-                          ? '#e11d48'
+                          ? 'var(--crimson-500)'
                           : interview.category === 'fun'
-                          ? '#06b6d4'
-                          : '#f59e0b'
+                          ? 'var(--cyan-500)'
+                          : 'var(--gold-500)'
                       }`,
+                      textDecoration: 'none',
+                      transition: 'var(--transition-smooth)',
                     }}
+                    className="link-row"
                   >
-                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600 }}>
-                      <span style={{ color: '#fff' }}>{interview.title}</span>
-                      <span style={{ color: '#94a3b8', fontSize: '11px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', fontWeight: 700 }}>
+                      <span style={{ color: 'var(--text-dark)' }}>{interview.title} ↗</span>
+                      <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
                         {interview.source} ({interview.duration})
                       </span>
                     </div>
-                    <p style={{ fontSize: '11.5px', color: '#cbd5e1', marginTop: '4px' }}>
+                    <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px' }}>
                       {interview.summary}
                     </p>
-                  </div>
+                  </a>
                 ))
               )}
             </div>

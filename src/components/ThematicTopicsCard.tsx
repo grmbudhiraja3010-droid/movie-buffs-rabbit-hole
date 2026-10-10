@@ -42,20 +42,20 @@ export const ThematicTopicsCard: React.FC<ThematicTopicsCardProps> = ({ topics, 
         </div>
 
         {/* Selected Topic Breakdown */}
-        <div style={{ background: 'rgba(6, 182, 212, 0.05)', border: '1px solid rgba(6, 182, 212, 0.2)', borderRadius: '10px', padding: '14px' }}>
-          <div style={{ fontSize: '14px', fontWeight: 700, color: '#67e8f9' }}>
-            Theme: {activeTopic.name}
+        <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '12px', padding: '16px' }}>
+          <div style={{ fontSize: '15px', fontWeight: 800, color: 'var(--text-dark)' }}>
+            Theme: #{activeTopic.name}
           </div>
-          <p style={{ fontSize: '12.5px', color: '#e2e8f0', marginTop: '4px', lineHeight: '1.45' }}>
+          <p style={{ fontSize: '13px', color: 'var(--text-body)', marginTop: '4px', lineHeight: '1.45' }}>
             {activeTopic.description}
           </p>
-          <div style={{ fontSize: '12px', color: '#94a3b8', marginTop: '6px' }}>
+          <div style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '6px' }}>
             <strong>Why it matters here:</strong> {activeTopic.relevanceReason}
           </div>
 
           {/* Other Landmark Movies exploring this exact topic */}
-          <div style={{ marginTop: '14px', borderTop: '1px solid rgba(255, 255, 255, 0.08)', paddingTop: '10px' }}>
-            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.05em' }}>
+          <div style={{ marginTop: '14px', borderTop: '1px solid var(--border-light)', paddingTop: '10px' }}>
+            <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--crimson-600)', fontWeight: 800, letterSpacing: '0.05em' }}>
               Other Landmark Cinema Exploring #{activeTopic.name}
             </span>
 
@@ -64,20 +64,21 @@ export const ThematicTopicsCard: React.FC<ThematicTopicsCardProps> = ({ topics, 
                 <div
                   key={i}
                   style={{
-                    background: 'rgba(0, 0, 0, 0.3)',
-                    padding: '8px 12px',
-                    borderRadius: '6px',
+                    background: '#ffffff',
+                    border: '1px solid var(--border-light)',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
                   <div>
-                    <span style={{ fontWeight: 600, color: '#fff', fontSize: '13px' }}>
+                    <span style={{ fontWeight: 700, color: 'var(--text-dark)', fontSize: '13px' }}>
                       {film.title} ({film.year})
                     </span>{' '}
-                    <span style={{ color: '#94a3b8', fontSize: '11.5px' }}>dir. {film.director}</span>
-                    <p style={{ fontSize: '11.5px', color: '#cbd5e1', marginTop: '2px' }}>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11.5px' }}>dir. {film.director}</span>
+                    <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '3px' }}>
                       {film.connection}
                     </p>
                   </div>

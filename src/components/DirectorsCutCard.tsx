@@ -61,11 +61,11 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
         </div>
 
         {/* Remake or Book Adaptation Details */}
-        <div style={{ marginTop: '14px', background: 'rgba(255, 255, 255, 0.03)', borderRadius: '10px', padding: '12px' }}>
-          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: '#fbbf24', fontWeight: 700, letterSpacing: '0.05em' }}>
+        <div style={{ marginTop: '14px', background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '10px', padding: '14px' }}>
+          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--crimson-600)', fontWeight: 800, letterSpacing: '0.05em' }}>
             Adaptation & Origin Matrix
           </span>
-          <div style={{ marginTop: '6px', fontSize: '12.5px', color: '#cbd5e1' }}>
+          <div style={{ marginTop: '6px', fontSize: '12.5px', color: 'var(--text-dark)' }}>
             {directorsCut.isBasedOnBook ? (
               <div>
                 📚 <strong>Based on Book:</strong> {directorsCut.bookTitle} by {directorsCut.bookAuthor}
@@ -76,14 +76,14 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
                       target="_blank"
                       rel="noopener noreferrer"
                       className="link-row"
-                      style={{ display: 'inline-flex', padding: '4px 10px', fontSize: '11.5px', color: '#fbbf24' }}
+                      style={{ display: 'inline-flex', padding: '5px 12px', fontSize: '12px', color: 'var(--crimson-600)', fontWeight: 600 }}
                     >
                       📖 View on Goodreads & Read Reader Reviews ↗
                     </a>
                   </div>
                 )}
                 {directorsCut.bookDivergenceNotes && (
-                  <p style={{ marginTop: '6px', fontSize: '12px', color: '#94a3b8' }}>
+                  <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
                     <strong>Adaptation Changes:</strong> {directorsCut.bookDivergenceNotes}
                   </p>
                 )}
@@ -91,7 +91,7 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
             ) : directorsCut.isRemake ? (
               <div>
                 🔄 <strong>Remake of:</strong> {directorsCut.remakeOriginalTitle}
-                <p style={{ marginTop: '4px', fontSize: '12px', color: '#94a3b8' }}>
+                <p style={{ marginTop: '4px', fontSize: '12px', color: 'var(--text-muted)' }}>
                   {directorsCut.remakeComparison}
                 </p>
               </div>
@@ -106,7 +106,7 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
         {/* Director Filmography */}
         <div style={{ marginTop: '16px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc' }}>
+            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dark)' }}>
               {directorsCut.directorName} Filmography:
             </span>
             <div style={{ display: 'flex', gap: '4px' }}>
@@ -127,7 +127,7 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
             {filteredFilmography.map((work, idx) => (
               <div key={idx} className={`filmo-chip ${work.rankCategory}`}>
                 <strong>{work.title}</strong> ({work.year}) •{' '}
-                <span style={{ color: '#fbbf24' }}>★ {work.rating}%</span>
+                <span style={{ color: 'var(--gold-600)', fontWeight: 600 }}>★ {work.rating}%</span>
               </div>
             ))}
           </div>
@@ -135,9 +135,9 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
 
         {/* Director Interviews */}
         {directorsCut.directorInterviews.length > 0 && (
-          <div style={{ marginTop: '16px', borderTop: '1px solid rgba(255, 255, 255, 0.06)', paddingTop: '12px' }}>
+          <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: '#f8fafc' }}>
+              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dark)' }}>
                 Director Masterclasses & Debates:
               </span>
               <div style={{ display: 'flex', gap: '4px' }}>
@@ -154,27 +154,35 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
               </div>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               {filteredInterviews.map((item) => (
-                <div
+                <a
                   key={item.id}
+                  href={item.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   style={{
-                    background: 'rgba(255, 255, 255, 0.02)',
-                    padding: '8px 10px',
-                    borderRadius: '6px',
-                    borderLeft: `3px solid ${item.category === 'controversial' ? '#e11d48' : '#f59e0b'}`,
+                    display: 'block',
+                    background: '#f8fafc',
+                    padding: '10px 12px',
+                    borderRadius: '8px',
+                    border: '1px solid var(--border-light)',
+                    borderLeft: `3px solid ${item.category === 'controversial' ? 'var(--crimson-500)' : 'var(--gold-500)'}`,
+                    textDecoration: 'none',
+                    transition: 'var(--transition-smooth)',
                   }}
+                  className="link-row"
                 >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', fontWeight: 600 }}>
-                    <span style={{ color: '#fff' }}>{item.title}</span>
-                    <span style={{ color: '#94a3b8', fontSize: '11px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', fontWeight: 700 }}>
+                    <span style={{ color: 'var(--text-dark)' }}>{item.title} ↗</span>
+                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
                       {item.source} ({item.duration})
                     </span>
                   </div>
-                  <p style={{ fontSize: '11.5px', color: '#cbd5e1', marginTop: '4px' }}>
+                  <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px' }}>
                     {item.summary}
                   </p>
-                </div>
+                </a>
               ))}
             </div>
           </div>

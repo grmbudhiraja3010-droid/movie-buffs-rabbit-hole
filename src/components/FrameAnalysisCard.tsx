@@ -58,11 +58,11 @@ export const FrameAnalysisCard: React.FC<FrameAnalysisCardProps> = ({ frames }) 
             </div>
           </div>
 
-          <div style={{ marginTop: '4px' }}>
-            <span style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600, display: 'block', marginBottom: '4px' }}>
+          <div style={{ marginTop: '10px' }}>
+            <span style={{ fontSize: '11px', color: 'var(--crimson-600)', fontWeight: 800, textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>
               Cinematic Symbolism:
             </span>
-            <p style={{ fontSize: '12.5px', color: '#cbd5e1', lineHeight: '1.45' }}>
+            <p style={{ fontSize: '12.5px', color: 'var(--text-body)', lineHeight: '1.45' }}>
               {activeFrame.symbolismDetails}
             </p>
           </div>

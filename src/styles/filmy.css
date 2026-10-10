@@ -1,5 +1,5 @@
 /* ==========================================================================
-   Movie Buff's Rabbit Hole — Filmy Cinematic Stylesheet
+   Movie Buff's Rabbit Hole — Filmy Poster Wallpaper with White Sections
    ========================================================================== */
 
 :root {
@@ -7,32 +7,29 @@
   --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 
   /* Cinema Palette */
-  --noir-950: #07090e;
-  --noir-900: #0c0f17;
-  --noir-850: #121622;
-  --noir-800: #181d2c;
-  --noir-700: #232a3e;
-  --noir-600: #333d59;
-
-  --gold-500: #f59e0b;
-  --gold-400: #fbbf24;
-  --crimson-500: #e11d48;
   --crimson-600: #be123c;
-  --amber-warm: #d97706;
-  --cyan-lens: #06b6d4;
+  --crimson-500: #e11d48;
+  --gold-500: #f59e0b;
+  --gold-600: #d97706;
+  --cyan-500: #06b6d4;
 
-  --text-primary: #f8fafc;
-  --text-secondary: #94a3b8;
+  --text-dark: #0f172a;
+  --text-body: #334155;
   --text-muted: #64748b;
+  --text-light: #94a3b8;
+
+  --border-light: #e2e8f0;
+  --bg-card: #ffffff;
+  --bg-subtle: #f8fafc;
 
   --radius-sm: 8px;
   --radius-md: 14px;
   --radius-lg: 20px;
-  --radius-xl: 28px;
+  --radius-xl: 24px;
 
-  --shadow-cinema: 0 10px 30px -5px rgba(0, 0, 0, 0.8), 0 0 20px rgba(245, 158, 11, 0.08);
-  --shadow-glow: 0 0 25px rgba(225, 29, 72, 0.25);
-  --transition-smooth: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  --shadow-card: 0 10px 25px -4px rgba(0, 0, 0, 0.28), 0 4px 10px -2px rgba(0, 0, 0, 0.15);
+  --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --transition-smooth: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
@@ -46,8 +43,14 @@ body.filmy-body {
   min-height: 100vh;
   margin: 0;
   padding: 0;
-  background-color: var(--noir-950);
-  color: var(--text-primary);
+  /* Mix of different film posters from attached reference with gentle atmospheric tint */
+  background-color: #0c0f17;
+  background-image: linear-gradient(rgba(10, 12, 18, 0.42), rgba(10, 12, 18, 0.52)), url('/images/film-posters-bg.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  color: var(--text-dark);
   font-family: var(--font-sans);
   font-size: 14px;
   line-height: 1.5;
@@ -56,45 +59,21 @@ body.filmy-body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Chrome Extension popup dimensions */
 #root {
   width: 100%;
   min-height: 100vh;
 }
 
-/* ── Film Grain & Cinematic Projection Atmosphere ─────────────────────── */
 .filmy-atmosphere {
   position: fixed;
   inset: 0;
   pointer-events: none;
   z-index: 9999;
-  opacity: 0.045;
+  opacity: 0.035;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-.projector-glow {
-  position: fixed;
-  top: -150px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 600px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(245, 158, 11, 0.15) 0%, rgba(225, 29, 72, 0.08) 45%, transparent 70%);
-  pointer-events: none;
-  z-index: 1;
-  filter: blur(40px);
-}
-
-.ambient-dust-layer {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  background: radial-gradient(circle at 80% 20%, rgba(6, 182, 212, 0.06) 0%, transparent 50%),
-              radial-gradient(circle at 10% 80%, rgba(225, 29, 72, 0.08) 0%, transparent 60%);
-  z-index: 1;
-}
-
-/* ── Layout & Rabbit Hole Shell ────────────────────────────────────────── */
+/* ── Container Layout ──────────────────────────────────────────────────── */
 .app-container {
   position: relative;
   z-index: 10;
@@ -103,26 +82,24 @@ body.filmy-body {
   padding: 16px 18px 48px;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 18px;
 }
 
-/* For standalone tab dashboard mode */
 .tab-mode-container {
-  max-width: 1080px;
+  max-width: 1040px;
   padding: 24px 32px 64px;
 }
 
-/* ── Cinematic Top Bar ─────────────────────────────────────────────────── */
+/* ── Header (Clean White Card) ─────────────────────────────────────────── */
 .cinema-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 18px;
-  background: rgba(18, 22, 34, 0.75);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.07);
+  padding: 14px 20px;
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-cinema);
+  box-shadow: var(--shadow-card);
+  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .brand-section {
@@ -132,51 +109,78 @@ body.filmy-body {
 }
 
 .film-reel-icon {
-  width: 36px;
-  height: 36px;
-  border-radius: 10px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   background: linear-gradient(135deg, var(--crimson-500), var(--gold-500));
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.35);
-  font-size: 18px;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
+  font-size: 19px;
+  color: #fff;
 }
 
 .brand-title {
   font-family: var(--font-serif);
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  background: linear-gradient(to right, #ffffff, #fef08a);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+  letter-spacing: 0.03em;
+  color: var(--text-dark);
 }
 
 .brand-sub {
   font-size: 11px;
-  color: var(--text-secondary);
-  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  font-weight: 600;
 }
 
-/* ── Audio Soundtrack Controller Bar ──────────────────────────────────── */
-.audio-bar {
+.header-action-btn {
+  background: #f1f5f9;
+  border: 1px solid var(--border-light);
+  color: var(--text-dark);
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 15px;
+  transition: var(--transition-smooth);
+}
+
+.header-action-btn:hover {
+  background: var(--crimson-500);
+  color: #fff;
+  border-color: var(--crimson-500);
+}
+
+/* ── Audio Soundtrack Controller Bar (White Card) ─────────────────────── */
+.audio-bar-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  border: 1px solid var(--border-light);
+}
+
+.audio-header-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 16px;
-  background: linear-gradient(90deg, rgba(24, 29, 44, 0.95), rgba(35, 42, 62, 0.85));
-  border: 1px solid rgba(245, 158, 11, 0.2);
-  border-radius: var(--radius-md);
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
   gap: 14px;
 }
 
-.audio-track-info {
+.audio-current-info {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   flex: 1;
   min-width: 0;
 }
@@ -185,98 +189,199 @@ body.filmy-body {
   display: flex;
   align-items: flex-end;
   gap: 3px;
-  height: 16px;
+  height: 18px;
   width: 18px;
 }
 
 .equalizer-bar {
   width: 3px;
-  background: var(--gold-400);
+  background: var(--gold-500);
   border-radius: 2px;
-  animation: eqBounce 1.2s ease-in-out infinite alternate;
+  animation: eqBounce 1.1s ease-in-out infinite alternate;
 }
 
 .equalizer-bar:nth-child(2) {
-  animation-delay: 0.3s;
+  animation-delay: 0.35s;
   background: var(--crimson-500);
 }
 
 .equalizer-bar:nth-child(3) {
-  animation-delay: 0.6s;
-  background: var(--gold-400);
+  animation-delay: 0.7s;
+  background: var(--gold-500);
 }
 
 @keyframes eqBounce {
   0% { height: 4px; }
-  100% { height: 16px; }
+  100% { height: 18px; }
 }
 
-.track-names {
-  min-width: 0;
+.audio-status-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--crimson-500);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
-.track-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #fff;
+.track-title-main {
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--text-dark);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.track-composer {
-  font-size: 10px;
-  color: var(--gold-400);
-}
-
-.audio-controls {
+.audio-slider-controls {
   display: flex;
   align-items: center;
   gap: 12px;
 }
 
-.audio-btn {
-  background: rgba(255, 255, 255, 0.08);
+.audio-circle-btn {
+  background: var(--crimson-500);
   border: none;
   color: #fff;
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  font-size: 14px;
+  box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3);
   transition: var(--transition-smooth);
 }
 
-.audio-btn:hover {
-  background: var(--crimson-500);
-  transform: scale(1.05);
+.audio-circle-btn:hover {
+  transform: scale(1.08);
 }
 
-.volume-slider-wrap {
+.volume-wrap {
   display: flex;
   align-items: center;
   gap: 6px;
+  background: #f1f5f9;
+  padding: 4px 10px;
+  border-radius: 20px;
 }
 
 .volume-slider {
-  width: 65px;
-  accent-color: var(--gold-400);
+  width: 70px;
+  accent-color: var(--crimson-500);
   cursor: pointer;
 }
 
-/* ── Rabbit Hole Depth Meter ─────────────────────────────────────────── */
+/* 2 Semantic Song Suggestions */
+.song-suggestions-wrapper {
+  border-top: 1px solid var(--border-light);
+  padding-top: 12px;
+}
+
+.suggestions-badge-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.suggestions-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+@media (max-width: 600px) {
+  .suggestions-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.song-card-item {
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+}
+
+.song-card-item:hover {
+  border-color: var(--gold-500);
+  background: #fffbeb;
+  transform: translateY(-1px);
+}
+
+.song-card-item.active-playing {
+  background: #fff1f2;
+  border-color: var(--crimson-500);
+}
+
+.song-item-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.song-play-icon {
+  font-size: 14px;
+  color: var(--crimson-500);
+}
+
+.song-item-title {
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--text-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.song-item-artist {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.song-item-mood {
+  font-size: 10.5px;
+  color: var(--gold-600);
+  font-weight: 600;
+}
+
+.song-action-pill {
+  padding: 4px 10px;
+  border-radius: 99px;
+  border: 1px solid var(--border-light);
+  background: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+}
+
+.song-action-pill.playing {
+  background: var(--crimson-500);
+  color: #fff;
+  border-color: var(--crimson-500);
+}
+
+/* ── Rabbit Hole Depth Meter (White Card) ──────────────────────────────── */
 .depth-meter-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 16px;
-  background: rgba(12, 15, 23, 0.85);
-  border-radius: var(--radius-sm);
-  border: 1px dashed rgba(255, 255, 255, 0.12);
-  font-size: 11px;
-  color: var(--text-secondary);
+  padding: 10px 18px;
+  background: var(--bg-card);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
+  font-size: 12px;
+  color: var(--text-body);
 }
 
 .depth-steps {
@@ -285,37 +390,26 @@ body.filmy-body {
 }
 
 .depth-dot {
-  width: 8px;
-  height: 8px;
+  width: 9px;
+  height: 9px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
+  background: #cbd5e1;
   transition: var(--transition-smooth);
 }
 
 .depth-dot.active {
-  background: var(--gold-400);
-  box-shadow: 0 0 8px var(--gold-400);
+  background: var(--crimson-500);
+  box-shadow: 0 0 6px rgba(225, 29, 72, 0.4);
 }
 
-/* ── Movie Hero / Playing Banner ──────────────────────────────────────── */
+/* ── Movie Hero / Playing Banner (White Card) ──────────────────────────── */
 .movie-hero {
   position: relative;
-  background: linear-gradient(180deg, rgba(24, 29, 44, 0.85) 0%, rgba(12, 15, 23, 0.95) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
   border-radius: var(--radius-xl);
   padding: 24px;
-  box-shadow: var(--shadow-cinema);
-  overflow: hidden;
-}
-
-.filmstrip-border-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  background: repeating-linear-gradient(90deg, #333d59, #333d59 12px, transparent 12px, transparent 18px);
-  opacity: 0.35;
+  box-shadow: var(--shadow-card);
+  border: 1px solid var(--border-light);
 }
 
 .hero-main-row {
@@ -325,18 +419,18 @@ body.filmy-body {
 
 .movie-poster-box {
   width: 110px;
-  height: 160px;
+  height: 155px;
   flex-shrink: 0;
   border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #1e293b, #0f172a);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: linear-gradient(135deg, #0f172a, #1e293b);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.2);
   text-align: center;
-  padding: 12px;
+  padding: 10px;
+  color: #fff;
 }
 
 .hero-details {
@@ -351,12 +445,12 @@ body.filmy-body {
   align-items: center;
   gap: 6px;
   padding: 4px 10px;
-  background: rgba(225, 29, 72, 0.15);
-  border: 1px solid rgba(225, 29, 72, 0.3);
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
   border-radius: 99px;
   font-size: 11px;
-  font-weight: 600;
-  color: #fb7185;
+  font-weight: 700;
+  color: var(--crimson-600);
   width: fit-content;
 }
 
@@ -365,44 +459,43 @@ body.filmy-body {
   height: 6px;
   border-radius: 50%;
   background: var(--crimson-500);
-  box-shadow: 0 0 8px var(--crimson-500);
   animation: pulse 1.5s infinite;
 }
 
 @keyframes pulse {
   0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.8); }
+  50% { opacity: 0.3; transform: scale(0.8); }
 }
 
 .movie-title {
   font-family: var(--font-serif);
   font-size: 26px;
   font-weight: 800;
-  color: #fff;
+  color: var(--text-dark);
   line-height: 1.2;
 }
 
 .movie-meta-line {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px 14px;
+  gap: 8px 12px;
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .meta-pill {
-  color: #cbd5e1;
+  color: var(--text-body);
+  font-weight: 500;
 }
 
 .meta-director strong {
-  color: var(--gold-400);
+  color: var(--crimson-600);
 }
 
 .movie-synopsis {
   font-size: 13px;
-  color: #94a3b8;
+  color: var(--text-body);
   line-height: 1.5;
-  margin-top: 4px;
 }
 
 .ratings-grid {
@@ -413,8 +506,8 @@ body.filmy-body {
 }
 
 .rating-chip {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   display: flex;
@@ -425,27 +518,27 @@ body.filmy-body {
 .rating-chip .score {
   font-size: 16px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-dark);
 }
 
-.rating-chip.rt .score { color: #f87171; }
-.rating-chip.imdb .score { color: var(--gold-400); }
-.rating-chip.special .score { color: var(--cyan-lens); }
+.rating-chip.rt .score { color: var(--crimson-600); }
+.rating-chip.imdb .score { color: var(--gold-600); }
+.rating-chip.special .score { color: #0284c7; }
 
-/* ── Search Switcher ─────────────────────────────────────────────────── */
+/* ── Search Bar ────────────────────────────────────────────────────────── */
 .search-movie-bar {
   display: flex;
   gap: 8px;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 .search-input {
   flex: 1;
-  background: rgba(7, 9, 14, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: 10px 14px;
-  color: #fff;
+  color: var(--text-dark);
   font-size: 13px;
   font-family: var(--font-sans);
   outline: none;
@@ -453,39 +546,42 @@ body.filmy-body {
 }
 
 .search-input:focus {
-  border-color: var(--gold-400);
-  box-shadow: 0 0 12px rgba(245, 158, 11, 0.2);
+  border-color: var(--crimson-500);
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(225, 29, 72, 0.1);
 }
 
 .search-btn {
-  background: linear-gradient(135deg, var(--crimson-500), var(--amber-warm));
+  background: var(--crimson-500);
   border: none;
   color: #fff;
-  font-weight: 600;
-  padding: 0 16px;
+  font-weight: 700;
+  padding: 0 18px;
   border-radius: var(--radius-md);
   cursor: pointer;
   font-size: 13px;
+  box-shadow: 0 4px 12px rgba(225, 29, 72, 0.25);
   transition: var(--transition-smooth);
 }
 
 .search-btn:hover {
-  opacity: 0.9;
+  opacity: 0.92;
   transform: translateY(-1px);
 }
 
-/* ── Quirky Reddit Summary ────────────────────────────────────────────── */
+/* ── Quirky Summary Banner (White Card) ────────────────────────────────── */
 .quirky-banner {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.1), rgba(225, 29, 72, 0.08));
-  border: 1px solid rgba(245, 158, 11, 0.25);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: 16px 20px;
+  padding: 18px 22px;
   display: flex;
-  gap: 14px;
+  gap: 16px;
+  box-shadow: var(--shadow-card);
 }
 
 .quirky-icon {
-  font-size: 24px;
+  font-size: 26px;
 }
 
 .quirky-content {
@@ -496,8 +592,8 @@ body.filmy-body {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: var(--gold-400);
-  font-weight: 600;
+  color: var(--crimson-600);
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   margin-bottom: 6px;
@@ -506,29 +602,25 @@ body.filmy-body {
 .quirky-quote {
   font-style: italic;
   font-size: 14px;
-  color: #f1f5f9;
+  color: var(--text-dark);
   line-height: 1.45;
   margin-bottom: 6px;
+  font-weight: 500;
 }
 
 .quirky-takeaway {
-  font-size: 12px;
-  color: #cbd5e1;
+  font-size: 12.5px;
+  color: var(--text-body);
 }
 
-/* ── Rabbit Hole Cards & Expandable Accordions ────────────────────────── */
+/* ── Rabbit Hole Sections (White Cards) ────────────────────────────────── */
 .rabbit-section {
-  background: rgba(18, 22, 34, 0.75);
-  backdrop-filter: blur(14px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: var(--bg-card);
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-shadow: var(--shadow-card);
   transition: var(--transition-smooth);
-}
-
-.rabbit-section:hover {
-  border-color: rgba(255, 255, 255, 0.15);
 }
 
 .section-trigger {
@@ -536,7 +628,7 @@ body.filmy-body {
   padding: 16px 20px;
   background: transparent;
   border: none;
-  color: #fff;
+  color: var(--text-dark);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -551,61 +643,61 @@ body.filmy-body {
 }
 
 .section-icon {
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .section-heading {
   font-family: var(--font-serif);
   font-size: 16px;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  color: var(--text-dark);
 }
 
 .section-badge {
   font-size: 11px;
-  padding: 2px 8px;
-  background: rgba(255, 255, 255, 0.08);
+  padding: 3px 10px;
+  background: #f1f5f9;
   border-radius: 99px;
-  color: var(--gold-400);
+  color: var(--crimson-600);
   font-family: var(--font-sans);
+  font-weight: 700;
 }
 
 .section-body {
   padding: 0 20px 20px;
-  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  border-top: 1px solid #f1f5f9;
 }
 
-/* ── Frame Analysis: Says vs Means ────────────────────────────────────── */
-.frame-card {
-  background: rgba(12, 15, 23, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+/* ── Inside Card Components (Subtle light grey on white) ──────────────── */
+.frame-card, .cast-item, .review-card {
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-md);
   padding: 16px;
   margin-top: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
 }
 
 .frame-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  margin-bottom: 10px;
 }
 
 .frame-title {
-  font-weight: 600;
-  color: #f8fafc;
+  font-weight: 700;
+  color: var(--text-dark);
   font-size: 14px;
 }
 
 .frame-time {
   font-family: monospace;
   font-size: 11px;
-  color: var(--gold-400);
-  background: rgba(245, 158, 11, 0.12);
-  padding: 2px 6px;
+  color: var(--crimson-600);
+  background: #fff1f2;
+  padding: 3px 8px;
   border-radius: 4px;
+  font-weight: 600;
 }
 
 .says-means-grid {
@@ -621,35 +713,39 @@ body.filmy-body {
 }
 
 .says-box {
-  background: rgba(255, 255, 255, 0.03);
+  background: #ffffff;
   border-left: 3px solid #64748b;
   border-radius: 4px;
   padding: 10px 12px;
+  border: 1px solid var(--border-light);
+  border-left-width: 3px;
 }
 
 .means-box {
-  background: rgba(225, 29, 72, 0.06);
+  background: #fff1f2;
   border-left: 3px solid var(--crimson-500);
   border-radius: 4px;
   padding: 10px 12px;
+  border: 1px solid #fecdd3;
+  border-left-width: 3px;
 }
 
 .sub-label {
   font-size: 10px;
   text-transform: uppercase;
-  font-weight: 700;
+  font-weight: 800;
   letter-spacing: 0.08em;
   margin-bottom: 4px;
   display: block;
 }
 
-.says-box .sub-label { color: #94a3b8; }
-.means-box .sub-label { color: #fb7185; }
+.says-box .sub-label { color: #475569; }
+.means-box .sub-label { color: var(--crimson-600); }
 
 .frame-text {
   font-size: 12.5px;
   line-height: 1.45;
-  color: #e2e8f0;
+  color: var(--text-dark);
 }
 
 .palette-bar {
@@ -658,16 +754,17 @@ body.filmy-body {
   align-items: center;
   font-size: 11px;
   color: var(--text-muted);
+  margin-top: 10px;
 }
 
 .color-swatch {
-  width: 14px;
-  height: 14px;
-  border-radius: 3px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid rgba(0, 0, 0, 0.15);
 }
 
-/* ── Reviews Card (Critics vs Normal + Filters) ───────────────────────── */
+/* ── Filter Pills ──────────────────────────────────────────────────────── */
 .review-filters {
   display: flex;
   gap: 8px;
@@ -676,27 +773,25 @@ body.filmy-body {
 }
 
 .filter-pill {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #cbd5e1;
-  padding: 4px 12px;
+  background: #f1f5f9;
+  border: 1px solid var(--border-light);
+  color: var(--text-body);
+  padding: 5px 13px;
   border-radius: 99px;
   font-size: 12px;
+  font-weight: 500;
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 .filter-pill:hover, .filter-pill.active {
-  background: var(--gold-400);
-  color: #000;
-  font-weight: 600;
-  border-color: var(--gold-400);
+  background: var(--crimson-500);
+  color: #fff;
+  font-weight: 700;
+  border-color: var(--crimson-500);
 }
 
 .review-card {
-  background: rgba(12, 15, 23, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.05);
-  border-radius: var(--radius-sm);
   padding: 12px 14px;
   margin-top: 8px;
 }
@@ -708,32 +803,24 @@ body.filmy-body {
 }
 
 .reviewer-name {
-  font-weight: 600;
+  font-weight: 700;
   font-size: 13px;
-  color: #fff;
+  color: var(--text-dark);
 }
 
 .review-stars {
-  color: var(--gold-400);
+  color: var(--gold-600);
   font-size: 12px;
 }
 
 .review-quote {
   font-size: 13px;
-  color: #cbd5e1;
+  color: var(--text-body);
   line-height: 1.45;
   font-style: italic;
 }
 
-/* ── Cast & Interviews ────────────────────────────────────────────────── */
-.cast-item {
-  background: rgba(12, 15, 23, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  border-radius: var(--radius-md);
-  padding: 14px;
-  margin-top: 10px;
-}
-
+/* ── Cast & Filmography Chips ─────────────────────────────────────────── */
 .cast-main {
   display: flex;
   justify-content: space-between;
@@ -744,12 +831,12 @@ body.filmy-body {
 .cast-name {
   font-size: 14px;
   font-weight: 700;
-  color: #fff;
+  color: var(--text-dark);
 }
 
 .cast-char {
   font-size: 12px;
-  color: var(--text-secondary);
+  color: var(--text-muted);
 }
 
 .filmography-chips {
@@ -760,15 +847,16 @@ body.filmy-body {
 }
 
 .filmo-chip {
-  font-size: 11px;
-  padding: 3px 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, 0.05);
-  color: #e2e8f0;
+  font-size: 11.5px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text-dark);
+  border: 1px solid var(--border-light);
 }
 
 .filmo-chip.best {
-  border-left: 2px solid var(--gold-400);
+  border-left: 3px solid var(--gold-500);
 }
 
 /* ── Genre & Country Table ────────────────────────────────────────────── */
@@ -779,15 +867,15 @@ body.filmy-body {
 }
 
 .genre-table th, .genre-table td {
-  padding: 8px 12px;
+  padding: 10px 12px;
   text-align: left;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid var(--border-light);
   font-size: 12.5px;
 }
 
 .genre-table th {
-  color: var(--gold-400);
-  font-weight: 600;
+  color: var(--crimson-600);
+  font-weight: 700;
   text-transform: uppercase;
   font-size: 11px;
 }
@@ -801,53 +889,58 @@ body.filmy-body {
 }
 
 .topic-tag {
-  background: rgba(6, 182, 212, 0.12);
-  border: 1px solid rgba(6, 182, 212, 0.3);
-  color: #67e8f9;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #15803d;
   padding: 5px 12px;
   border-radius: 99px;
   font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
   transition: var(--transition-smooth);
 }
 
 .topic-tag:hover, .topic-tag.active {
-  background: var(--cyan-lens);
-  color: #000;
-  font-weight: 600;
+  background: #15803d;
+  color: #fff;
+  border-color: #15803d;
 }
 
-/* ── Opposite Movies & Similar ────────────────────────────────────────── */
+/* ── Opposite Movies & Contrast ───────────────────────────────────────── */
 .contrast-card {
-  background: linear-gradient(135deg, rgba(225, 29, 72, 0.1), rgba(12, 15, 23, 0.9));
-  border: 1px solid rgba(225, 29, 72, 0.3);
+  background: #fff1f2;
+  border: 1px solid #fecdd3;
   border-radius: var(--radius-md);
-  padding: 12px 16px;
+  padding: 14px 16px;
   margin-top: 10px;
 }
 
 .contrast-title {
-  color: #fb7185;
+  color: var(--crimson-600);
   font-weight: 700;
-  font-size: 13.5px;
+  font-size: 14px;
 }
 
-/* ── External Links (Reddit / Substack / Goodreads) ────────────────────── */
+/* ── Active Links ──────────────────────────────────────────────────────── */
 .link-row {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px 12px;
-  background: rgba(255, 255, 255, 0.03);
+  padding: 10px 14px;
+  background: #f8fafc;
+  border: 1px solid var(--border-light);
   border-radius: var(--radius-sm);
-  margin-top: 6px;
+  margin-top: 8px;
   text-decoration: none;
-  color: #e2e8f0;
+  color: var(--text-dark);
   font-size: 13px;
+  font-weight: 500;
   transition: var(--transition-smooth);
 }
 
 .link-row:hover {
-  background: rgba(255, 255, 255, 0.08);
-  color: var(--gold-400);
+  background: #ffffff;
+  border-color: var(--crimson-500);
+  color: var(--crimson-600);
+  transform: translateY(-1px);
 }

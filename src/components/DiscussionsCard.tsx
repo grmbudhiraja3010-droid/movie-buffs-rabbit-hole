@@ -72,20 +72,22 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
               <div
                 key={idx}
                 style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
+                  background: '#f8fafc',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  borderLeft: '3px solid #f59e0b',
+                  borderLeft: '3px solid var(--gold-500)',
+                  border: '1px solid var(--border-light)',
+                  borderLeftWidth: '3px',
                 }}
               >
-                <div style={{ fontSize: '14px', fontStyle: 'italic', color: '#fef08a' }}>
+                <div style={{ fontSize: '14px', fontStyle: 'italic', color: 'var(--text-dark)', fontWeight: 600 }}>
                   "{q.quote}"
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '11.5px', color: '#94a3b8' }}>
-                  <span>Spoken by: <strong style={{ color: '#fff' }}>{q.speaker}</strong></span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '11.5px', color: 'var(--text-muted)' }}>
+                  <span>Spoken by: <strong style={{ color: 'var(--text-dark)' }}>{q.speaker}</strong></span>
                   <span>{q.sceneContext}</span>
                 </div>
-                <div style={{ fontSize: '11px', color: '#cbd5e1', marginTop: '4px' }}>
+                <div style={{ fontSize: '11px', color: 'var(--text-body)', marginTop: '4px' }}>
                   <strong>Cultural Use:</strong> {q.culturalUse}
                 </div>
               </div>
@@ -119,32 +121,35 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
                 <div
                   key={idx}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: '#f8fafc',
                     padding: '12px 14px',
                     borderRadius: '8px',
-                    borderLeft: '3px solid #e11d48',
+                    borderLeft: '3px solid var(--crimson-500)',
+                    border: '1px solid var(--border-light)',
+                    borderLeftWidth: '3px',
                   }}
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: '#fff' }}>
+                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-dark)' }}>
                       {d.topic}
                     </span>
                     <span
                       style={{
                         fontSize: '11px',
-                        background: 'rgba(225, 29, 72, 0.15)',
-                        color: '#fb7185',
-                        padding: '2px 6px',
+                        background: '#fff1f2',
+                        color: 'var(--crimson-600)',
+                        padding: '2px 8px',
                         borderRadius: '4px',
+                        fontWeight: 600,
                       }}
                     >
                       Relevancy: {d.relevancyScore}% • {d.latestDate}
                     </span>
                   </div>
-                  <p style={{ fontSize: '12.5px', color: '#cbd5e1', marginTop: '6px', lineHeight: '1.45' }}>
+                  <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '6px', lineHeight: '1.45' }}>
                     {d.summary}
                   </p>
-                  <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '6px' }}>
+                  <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
                     <strong>Fanbase Divisions:</strong> {d.fanbaseSides}
                   </div>
                 </div>
@@ -165,8 +170,8 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
                 className="link-row"
               >
                 <div>
-                  <div style={{ fontWeight: 600, color: '#fff' }}>{thread.title}</div>
-                  <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '2px' }}>
+                  <div style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{thread.title}</div>
+                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
                     {thread.subreddit} • ▲ {thread.upvotes.toLocaleString()} upvotes • 💬 {thread.commentsCount} comments
                   </div>
                 </div>
@@ -200,13 +205,13 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
                 style={{ flexDirection: 'column', alignItems: 'flex-start' }}
               >
                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                  <span style={{ fontWeight: 600, color: '#fff' }}>{essay.title}</span>
-                  <span style={{ fontSize: '11px', color: '#f59e0b' }}>{essay.readTime} ↗</span>
+                  <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{essay.title}</span>
+                  <span style={{ fontSize: '11px', color: 'var(--crimson-600)', fontWeight: 600 }}>{essay.readTime} ↗</span>
                 </div>
-                <div style={{ fontSize: '11.5px', color: '#94a3b8', marginTop: '2px' }}>
+                <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
                   by {essay.author} in <em>{essay.publication}</em>
                 </div>
-                <p style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px', fontStyle: 'italic' }}>
+                <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px', fontStyle: 'italic' }}>
                   "{essay.snippet}"
                 </p>
               </a>

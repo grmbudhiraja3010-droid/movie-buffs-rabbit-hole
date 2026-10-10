@@ -146,11 +146,15 @@ export interface SoundtrackTrack {
   title: string;
   composer: string;
   mood: string;
-  audioPreset: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow';
+  melodyStyle: 'time_crescendo' | 'piaf_waltz' | 'soju_piano' | 'belt_baroque' | 'oppenheimer_strings' | 'trinity_tension' | 'interstellar_organ' | 'cinema_noir_jazz' | 'cyberpunk_synth' | 'lofi_acoustic';
+  similarityTags: string[];
+  similarSongIds: string[];
+  audioPreset?: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow';
 }
 
 export interface MovieBuffData {
   id: string;
+  contentType?: 'movie' | 'general_video';
   title: string;
   year: number;
   tagline: string;

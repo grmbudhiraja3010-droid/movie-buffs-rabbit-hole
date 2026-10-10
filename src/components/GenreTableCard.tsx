@@ -99,31 +99,32 @@ export const GenreTableCard: React.FC<GenreTableCardProps> = ({ movieData }) => 
           )}
 
           {tabMode === 'country' && (
-            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: '8px' }}>
+            <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#fbbf24' }}>
+                <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--crimson-600)' }}>
                   Country Spotlight: {movieData.country}
                 </span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>National Cinema Legacy</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>National Cinema Legacy</span>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#cbd5e1', marginTop: '6px', lineHeight: '1.45' }}>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '6px', lineHeight: '1.45' }}>
                 Exploring cinematic movements native to {movieData.country}. Screen titles sorted by critical acclaim and historical significance.
               </p>
-              <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '6px' }}>
+              <div style={{ marginTop: '12px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
                 {movieData.genreCatalogue[0]?.topRatedTitles.map((t, idx) => (
                   <div
                     key={idx}
                     style={{
                       display: 'flex',
                       justifyContent: 'space-between',
-                      background: 'rgba(255, 255, 255, 0.04)',
-                      padding: '6px 10px',
-                      borderRadius: '4px',
-                      fontSize: '12px',
+                      background: '#ffffff',
+                      border: '1px solid var(--border-light)',
+                      padding: '8px 12px',
+                      borderRadius: '6px',
+                      fontSize: '12.5px',
                     }}
                   >
                     <span><strong>{t.title}</strong> ({t.year})</span>
-                    <span style={{ color: '#fbbf24' }}>🍅 {t.rtScore}% High RT</span>
+                    <span style={{ color: 'var(--crimson-600)', fontWeight: 700 }}>🍅 {t.rtScore}% RT</span>
                   </div>
                 ))}
               </div>
@@ -131,26 +132,28 @@ export const GenreTableCard: React.FC<GenreTableCardProps> = ({ movieData }) => 
           )}
 
           {tabMode === 'language' && (
-            <div style={{ background: 'rgba(255, 255, 255, 0.02)', padding: '14px', borderRadius: '8px' }}>
+            <div style={{ background: '#f8fafc', border: '1px solid var(--border-light)', padding: '16px', borderRadius: '10px' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '14px', fontWeight: 700, color: '#06b6d4' }}>
+                <span style={{ fontSize: '15px', fontWeight: 800, color: 'var(--crimson-600)' }}>
                   Language Spotlight: {movieData.language}
                 </span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>Dialogue Rhythm & Cadence</span>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Dialogue Rhythm & Cadence</span>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#cbd5e1', marginTop: '6px', lineHeight: '1.45' }}>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '6px', lineHeight: '1.45' }}>
                 Films crafted in {movieData.language}. Cinephile recommendation: watch in original audio with subtitles to preserve authentic vocal inflection and intended sound design.
               </p>
-              <div style={{ marginTop: '10px', display: 'flex', flexWrap: 'wrap', gap: '6px' }}>
+              <div style={{ marginTop: '12px', display: 'flex', flexWrap: 'wrap', gap: '8px' }}>
                 {movieData.subgenres.map((sg, i) => (
                   <span
                     key={i}
                     style={{
-                      background: 'rgba(6, 182, 212, 0.1)',
-                      color: '#67e8f9',
-                      padding: '4px 10px',
-                      borderRadius: '4px',
-                      fontSize: '11.5px',
+                      background: '#f1f5f9',
+                      border: '1px solid var(--border-light)',
+                      color: 'var(--text-dark)',
+                      padding: '5px 12px',
+                      borderRadius: '6px',
+                      fontSize: '12px',
+                      fontWeight: 600,
                     }}
                   >
                     {sg} in {movieData.language}

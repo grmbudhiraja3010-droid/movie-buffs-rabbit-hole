@@ -55,24 +55,26 @@ export const BloopersCard: React.FC<BloopersCardProps> = ({ bloopers }) => {
             <div
               key={item.id}
               style={{
-                background: 'rgba(255, 255, 255, 0.03)',
+                background: '#f8fafc',
                 padding: '12px 14px',
                 borderRadius: '8px',
-                borderLeft: `3px solid ${item.type === 'funny' ? '#f59e0b' : '#e11d48'}`,
+                border: '1px solid var(--border-light)',
+                borderLeft: `3px solid ${item.type === 'funny' ? 'var(--gold-500)' : 'var(--crimson-500)'}`,
+                borderLeftWidth: '3px',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13.5px', fontWeight: 600, color: '#fff' }}>
+                <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-dark)' }}>
                   {item.title}
                 </span>
-                <span style={{ fontSize: '11px', color: '#94a3b8' }}>
+                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
                   {item.timestamp ? `Scene: ${item.timestamp}` : ''} •{' '}
-                  <strong style={{ color: item.type === 'funny' ? '#fbbf24' : '#fb7185' }}>
+                  <strong style={{ color: item.type === 'funny' ? 'var(--gold-600)' : 'var(--crimson-600)' }}>
                     {item.type.toUpperCase()}
                   </strong>
                 </span>
               </div>
-              <p style={{ fontSize: '12.5px', color: '#cbd5e1', marginTop: '4px', lineHeight: '1.45' }}>
+              <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '4px', lineHeight: '1.45' }}>
                 {item.description}
               </p>
             </div>

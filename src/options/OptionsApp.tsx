@@ -30,15 +30,15 @@ export const OptionsApp: React.FC = () => {
         </header>
 
         <div className="rabbit-section" style={{ padding: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: '#fff', marginBottom: '16px' }}>
+          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: 'var(--text-dark)', marginBottom: '16px' }}>
             Soundtrack & Ambient Scores
           </h2>
 
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <strong style={{ color: '#fff', display: 'block' }}>Default Background Soundtrack Volume</strong>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Default Background Soundtrack Volume</strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Ambient soundtrack level when opening extension
                 </span>
               </div>
@@ -51,14 +51,14 @@ export const OptionsApp: React.FC = () => {
                   onChange={(e) => setDefaultVolume(Number(e.target.value))}
                   className="volume-slider"
                 />
-                <span style={{ fontSize: '12px', color: '#fbbf24', width: '32px' }}>{defaultVolume}%</span>
+                <span style={{ fontSize: '12px', color: 'var(--crimson-600)', fontWeight: 700, width: '36px' }}>{defaultVolume}%</span>
               </div>
             </label>
 
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <strong style={{ color: '#fff', display: 'block' }}>Auto-Play Cinematic Ambience</strong>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Auto-Play Cinematic Ambience</strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Subtly begin playing ambient synthesizer score when viewing film details
                 </span>
               </div>
@@ -75,10 +75,10 @@ export const OptionsApp: React.FC = () => {
             style={{
               fontFamily: 'var(--font-serif)',
               fontSize: '18px',
-              color: '#fff',
+              color: 'var(--text-dark)',
               marginTop: '24px',
               marginBottom: '16px',
-              borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+              borderTop: '1px solid var(--border-light)',
               paddingTop: '16px',
             }}
           >
@@ -88,8 +88,8 @@ export const OptionsApp: React.FC = () => {
           <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <strong style={{ color: '#fff', display: 'block' }}>Netflix Detection</strong>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Netflix Detection</strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Automatically detect titles and frames playing on netflix.com
                 </span>
               </div>
@@ -103,8 +103,8 @@ export const OptionsApp: React.FC = () => {
 
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div>
-                <strong style={{ color: '#fff', display: 'block' }}>YouTube Detection</strong>
-                <span style={{ fontSize: '12px', color: '#94a3b8' }}>
+                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>YouTube Detection</strong>
+                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
                   Automatically detect movie trailers and video essays on youtube.com
                 </span>
               </div>

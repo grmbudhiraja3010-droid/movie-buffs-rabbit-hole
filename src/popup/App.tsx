@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { detectCurrentMovie, type ActiveContext } from '../services/contextService';
-import { getMovieData, CURATED_MOVIES } from '../data/movies';
+import { getMovieData, getGeneralVideoData, CURATED_MOVIES } from '../data/movies';
 import type { MovieBuffData } from '../types/movie';
 
 import { AudioPlayerBar } from '../components/AudioPlayerBar';
@@ -28,35 +28,70 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [depthLevel, setDepthLevel] = useState(1);
 
-  // Initial detection
+  // Initial detection & State restoration
   useEffect(() => {
     async function load() {
-      const detected = await detectCurrentMovie();
+      const urlParams = new URLSearchParams(window.location.search);
+      const requestedMovie = urlParams.get('movie');
+
+      const detected = await detectCurrentMovie(requestedMovie);
       setContext(detected);
       setMovieData(detected.movieData);
+
+      // Persist active movie so future popup opens or tabs stay intact
+      if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+        chrome.storage.local.set({
+          lastActiveMovieId: detected.movieData.id,
+          lastContentType: detected.movieData.contentType || 'movie',
+          lastWatchedUrl: detected.sourceUrl || '',
+        });
+      }
     }
     void load();
   }, []);
+
+  const updateActiveMovie = (newData: MovieBuffData) => {
+    setMovieData(newData);
+    if (typeof chrome !== 'undefined' && chrome.storage?.local) {
+      chrome.storage.local.set({
+        lastActiveMovieId: newData.id,
+        lastContentType: newData.contentType || 'movie',
+      });
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
     const found = getMovieData(searchQuery.trim());
-    setMovieData(found);
+    updateActiveMovie(found);
     setSearchQuery('');
   };
 
   const handleMovieSelect = (title: string) => {
     const found = getMovieData(title);
-    setMovieData(found);
+    updateActiveMovie(found);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleOpenTab = () => {
-    if (typeof chrome !== 'undefined' && chrome.tabs?.create) {
-      void chrome.tabs.create({ url: chrome.runtime.getURL('popup.html?mode=tab') });
+  const handleToggleContentType = () => {
+    if (movieData.contentType === 'general_video') {
+      // Switch to movie analysis
+      const movie = getMovieData(movieData.title);
+      updateActiveMovie(movie);
     } else {
-      window.open('popup.html?mode=tab', '_blank');
+      // Switch to general video
+      const gen = getGeneralVideoData(movieData.title, movieData.director);
+      updateActiveMovie(gen);
+    }
+  };
+
+  const handleOpenTab = () => {
+    const targetUrl = `popup.html?mode=tab&movie=${encodeURIComponent(movieData.id)}&contentType=${encodeURIComponent(movieData.contentType || 'movie')}`;
+    if (typeof chrome !== 'undefined' && chrome.tabs?.create) {
+      void chrome.tabs.create({ url: chrome.runtime.getURL(targetUrl) });
+    } else {
+      window.open(targetUrl, '_blank');
     }
   };
 
@@ -68,12 +103,11 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
     }
   };
 
+  const isGeneralVideo = movieData.contentType === 'general_video';
+
   return (
     <>
-      {/* Filmy Atmosphere Layers */}
       <div className="filmy-atmosphere" />
-      <div className="projector-glow" />
-      <div className="ambient-dust-layer" />
 
       <div className={`app-container ${mode === 'tab' ? 'tab-mode-container' : ''}`}>
         {/* Cinema Header */}
@@ -89,42 +123,58 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           <div style={{ display: 'flex', gap: '8px' }}>
             {mode === 'popup' && (
               <button
-                className="audio-btn"
+                className="header-action-btn"
                 onClick={handleOpenTab}
-                title="Expand to Fullscreen Dashboard Tab"
-                style={{ borderRadius: '8px', width: '34px', height: '34px' }}
+                title="Expand to Fullscreen Dashboard Tab (keeps current page intact)"
               >
                 ⤢
               </button>
             )}
             <button
-              className="audio-btn"
+              className="header-action-btn"
               onClick={handleOpenOptions}
               title="Cinephile Settings"
-              style={{ borderRadius: '8px', width: '34px', height: '34px' }}
             >
               ⚙
             </button>
           </div>
         </header>
 
-        {/* Audio Soundtrack Player (Plays background song while watching) */}
-        <AudioPlayerBar tracks={movieData.soundtrack} />
+        {/* Content Type Identifier Bar */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ffffff', padding: '8px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}>
+            <span style={{ fontSize: '15px' }}>{isGeneralVideo ? '📹' : '🎬'}</span>
+            <span>
+              Detected: <strong>{isGeneralVideo ? 'General Video / Online Media' : 'Cinema / Movie Title'}</strong>
+            </span>
+          </div>
 
-        {/* Rabbit Hole Depth Meter */}
-        <DepthMeter currentLevel={depthLevel} onSelectLevel={(lvl) => setDepthLevel(lvl)} />
+          <button
+            onClick={handleToggleContentType}
+            className="filter-pill"
+            style={{ fontSize: '11px', padding: '3px 10px' }}
+          >
+            {isGeneralVideo ? 'Analyze as Movie ↗' : 'View as General Video ↗'}
+          </button>
+        </div>
 
-        {/* Movie Playing / Hero Banner */}
+        {/* Audio Soundtrack Player (2 Semantic Songs with Dynamic Similarity) */}
+        <AudioPlayerBar initialTracks={movieData.soundtrack} />
+
+        {/* Rabbit Hole Depth Meter (Active for Cinema mode) */}
+        {!isGeneralVideo && (
+          <DepthMeter currentLevel={depthLevel} onSelectLevel={(lvl) => setDepthLevel(lvl)} />
+        )}
+
+        {/* Movie Hero / Playing Banner */}
         <section className="movie-hero">
-          <div className="filmstrip-border-top" />
-
           <div className="hero-main-row">
             <div className="movie-poster-box">
-              <div style={{ fontSize: '36px', marginBottom: '8px' }}>📽️</div>
-              <div style={{ fontSize: '11px', color: '#94a3b8', fontWeight: 600 }}>
+              <div style={{ fontSize: '36px', marginBottom: '8px' }}>{isGeneralVideo ? '📹' : '📽️'}</div>
+              <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600 }}>
                 {movieData.primaryGenre}
               </div>
-              <div style={{ fontSize: '10px', color: '#f59e0b', marginTop: '4px' }}>
+              <div style={{ fontSize: '10px', color: '#fbbf24', marginTop: '4px' }}>
                 {movieData.country}
               </div>
             </div>
@@ -133,7 +183,7 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
               {context?.isWatching && (
                 <div className="watching-badge">
                   <span className="pulse-dot" />
-                  <span>Now Playing ({context.platform.toUpperCase()})</span>
+                  <span>Now Watching ({context.platform.toUpperCase()})</span>
                 </div>
               )}
 
@@ -145,7 +195,8 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
                 <span className="meta-pill">{movieData.runtime}</span>
                 <span>•</span>
                 <span className="meta-director">
-                  Directed by <strong>{movieData.director}</strong>
+                  {isGeneralVideo ? 'Creator / Channel: ' : 'Directed by '}
+                  <strong>{movieData.director}</strong>
                 </span>
                 <span>•</span>
                 <span className="meta-pill">{movieData.language}</span>
@@ -170,7 +221,7 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           </form>
         </section>
 
-        {/* Quirky Reddit Summary */}
+        {/* Quirky Community Summary */}
         <QuirkySummaryCard
           source={movieData.quirkySummary.source}
           quote={movieData.quirkySummary.quote}
@@ -178,41 +229,62 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           takeaway={movieData.quirkySummary.takeaway}
         />
 
-        {/* Reviews Section (Directly under movie hero) */}
-        <ReviewsCard reviews={movieData.reviews} ratings={movieData.ratings} />
+        {/* CINEMA-SPECIFIC SECTIONS: Only displayed when data is available for movies */}
+        {!isGeneralVideo && (
+          <>
+            {/* Reviews Section */}
+            {movieData.reviews.length > 0 && (
+              <ReviewsCard reviews={movieData.reviews} ratings={movieData.ratings} />
+            )}
 
-        {/* Frame Analysis: Says vs Means */}
-        <FrameAnalysisCard frames={movieData.frames} />
+            {/* Frame Analysis: Says vs Means */}
+            {movieData.frames.length > 0 && (
+              <FrameAnalysisCard frames={movieData.frames} />
+            )}
 
-        {/* Cast Rabbit Hole (Main leads to rest, filmography, interviews) */}
-        <CastRabbitHole cast={movieData.cast} />
+            {/* Cast Rabbit Hole */}
+            {movieData.cast.length > 0 && (
+              <CastRabbitHole cast={movieData.cast} />
+            )}
 
-        {/* Director's Cut (Creative vision, pacing, remakes, Goodreads link) */}
-        <DirectorsCutCard directorsCut={movieData.directorsCut} />
+            {/* Director's Cut */}
+            {movieData.directorsCut?.creativeVision && (
+              <DirectorsCutCard directorsCut={movieData.directorsCut} />
+            )}
 
-        {/* Genre Table (Expandable with Country & Language sections) */}
-        <GenreTableCard movieData={movieData} />
+            {/* Genre Table */}
+            {movieData.genreCatalogue.length > 0 && (
+              <GenreTableCard movieData={movieData} />
+            )}
 
-        {/* Thematic Topics (Non-genre themes & jumping to other movies) */}
-        <ThematicTopicsCard
-          topics={movieData.topics}
-          onSelectMovie={handleMovieSelect}
-        />
+            {/* Thematic Topics */}
+            {movieData.topics.length > 0 && (
+              <ThematicTopicsCard
+                topics={movieData.topics}
+                onSelectMovie={handleMovieSelect}
+              />
+            )}
 
-        {/* Ending Explained, Similar Movies & Polar Opposite Palate Cleansers */}
-        <EndingExplainedCard
-          ending={movieData.endingExplained}
-          onSelectMovie={handleMovieSelect}
-        />
+            {/* Ending Explained */}
+            {movieData.endingExplained?.summary && (
+              <EndingExplainedCard
+                ending={movieData.endingExplained}
+                onSelectMovie={handleMovieSelect}
+              />
+            )}
 
-        {/* Bloopers & BTS Outtakes (Funny vs Dramatic) */}
-        <BloopersCard bloopers={movieData.bloopers} />
+            {/* Bloopers & BTS Outtakes */}
+            {movieData.bloopers.length > 0 && (
+              <BloopersCard bloopers={movieData.bloopers} />
+            )}
+          </>
+        )}
 
         {/* Discussions, Fandoms, Quotes, Debates, Reddit & Substack */}
         <DiscussionsCard discussions={movieData.discussions} />
 
         {/* Footer */}
-        <footer style={{ textAlign: 'center', color: '#64748b', fontSize: '11px', marginTop: '20px' }}>
+        <footer style={{ textAlign: 'center', color: '#ffffff', fontSize: '12px', marginTop: '16px', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
           Movie Buff's Rabbit Hole • Made for cinephiles • Privacy-first
         </footer>
       </div>

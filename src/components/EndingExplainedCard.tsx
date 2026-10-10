@@ -64,13 +64,15 @@ export const EndingExplainedCard: React.FC<EndingExplainedCardProps> = ({ ending
                 <div
                   key={idx}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    padding: '10px 14px',
+                    background: '#f8fafc',
+                    padding: '12px 14px',
                     borderRadius: '8px',
-                    borderLeft: '3px solid #06b6d4',
-                    fontSize: '12.5px',
+                    border: '1px solid var(--border-light)',
+                    borderLeft: '3px solid var(--cyan-500)',
+                    borderLeftWidth: '3px',
+                    fontSize: '13px',
                     lineHeight: '1.45',
-                    color: '#e2e8f0',
+                    color: 'var(--text-dark)',
                   }}
                 >
                   {theory}
@@ -82,7 +84,7 @@ export const EndingExplainedCard: React.FC<EndingExplainedCardProps> = ({ ending
 
         {activeTab === 'similar' && (
           <div>
-            <p style={{ fontSize: '12.5px', color: '#94a3b8', marginBottom: '10px' }}>
+            <p style={{ fontSize: '12.5px', color: 'var(--text-muted)', marginBottom: '10px' }}>
               If you loved the narrative architecture and philosophical weight of this film, watch these next:
             </p>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
@@ -90,21 +92,22 @@ export const EndingExplainedCard: React.FC<EndingExplainedCardProps> = ({ ending
                 <div
                   key={i}
                   style={{
-                    background: 'rgba(255, 255, 255, 0.03)',
+                    background: '#f8fafc',
                     padding: '12px 14px',
                     borderRadius: '8px',
+                    border: '1px solid var(--border-light)',
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                   }}
                 >
                   <div>
-                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: '#fff' }}>
+                    <div style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-dark)' }}>
                       {sim.title} ({sim.year}) •{' '}
-                      <span style={{ color: '#fbbf24', fontSize: '12px' }}>★ {sim.rating}%</span>
+                      <span style={{ color: 'var(--gold-600)', fontSize: '12px' }}>★ {sim.rating}%</span>
                     </div>
-                    <div style={{ fontSize: '11.5px', color: '#94a3b8' }}>dir. {sim.director}</div>
-                    <p style={{ fontSize: '12px', color: '#cbd5e1', marginTop: '4px' }}>{sim.pitch}</p>
+                    <div style={{ fontSize: '11.5px', color: 'var(--text-muted)' }}>dir. {sim.director}</div>
+                    <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px' }}>{sim.pitch}</p>
                   </div>
                   {onSelectMovie && (
                     <button

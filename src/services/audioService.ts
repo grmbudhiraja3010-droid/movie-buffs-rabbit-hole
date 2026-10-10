@@ -1,43 +1,57 @@
 /**
  * Audio Service for Movie Buff's Rabbit Hole.
- * Generates rich, cinematic, atmospheric background soundtrack scores
- * directly via the Web Audio API with zero external dependencies.
- *
- * Supports volume control, mute, ambient presets (Noir Drone, Sci-Fi Synth,
- * Tension Strings, Lo-Fi Tape, Orchestral Glow), and playback states.
+ * Coordinates background soundtrack playback with offscreen document.
+ * Manages semantic song recommendations (max 2 suggestions at any time).
  */
+import { ALL_SEMANTIC_SONGS } from '../data/movies';
+import type { SoundtrackTrack } from '../types/movie';
 
-export interface TrackMetadata {
-  id: string;
-  title: string;
-  composer: string;
-  mood: string;
-  preset: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow';
+export interface AudioState {
+  isPlaying: boolean;
+  currentSong: SoundtrackTrack | null;
+  volume: number;
+  suggestions: SoundtrackTrack[]; // exactly 2 recommendations max
 }
 
-class CinematicAudioEngine {
-  private ctx: AudioContext | null = null;
-  private gainNode: GainNode | null = null;
+class AudioClient {
   private isPlaying: boolean = false;
-  private volume: number = 0.45;
-  private isMuted: boolean = false;
-  private activePreset: string = 'noir_drone';
-  private oscillators: (OscillatorNode | AudioNode)[] = [];
-  private timerId: number | null = null;
-  private listeners: Set<(state: { isPlaying: boolean; volume: number; isMuted: boolean; activePreset: string }) => void> = new Set();
+  private currentSong: SoundtrackTrack | null = null;
+  private volume: number = 0.5;
+  private suggestions: SoundtrackTrack[] = [];
+  private listeners: Set<(state: AudioState) => void> = new Set();
 
-  private getContext(): AudioContext {
-    if (!this.ctx) {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      this.ctx = new AudioCtx();
-    }
-    if (this.ctx.state === 'suspended') {
-      void this.ctx.resume();
-    }
-    return this.ctx;
+  constructor() {
+    this.initStatusCheck();
+    this.listenForBackgroundUpdates();
   }
 
-  public subscribe(fn: (state: { isPlaying: boolean; volume: number; isMuted: boolean; activePreset: string }) => void): () => void {
+  private initStatusCheck() {
+    if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({ type: 'GET_AUDIO_STATUS' }).then((res) => {
+        if (res && res.isPlaying) {
+          this.isPlaying = res.isPlaying;
+          this.currentSong = res.currentSong;
+          this.volume = res.volume ?? 0.5;
+          this.notify();
+        }
+      }).catch(() => {});
+    }
+  }
+
+  private listenForBackgroundUpdates() {
+    if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
+      chrome.runtime.onMessage.addListener((msg) => {
+        if (msg.type === 'AUDIO_STATUS_CHANGED') {
+          this.isPlaying = msg.isPlaying;
+          this.currentSong = msg.currentSong;
+          this.volume = msg.volume ?? this.volume;
+          this.notify();
+        }
+      });
+    }
+  }
+
+  public subscribe(fn: (state: AudioState) => void): () => void {
     this.listeners.add(fn);
     fn(this.getState());
     return () => {
@@ -45,12 +59,12 @@ class CinematicAudioEngine {
     };
   }
 
-  public getState() {
+  public getState(): AudioState {
     return {
       isPlaying: this.isPlaying,
+      currentSong: this.currentSong,
       volume: this.volume,
-      isMuted: this.isMuted,
-      activePreset: this.activePreset,
+      suggestions: this.suggestions.slice(0, 2),
     };
   }
 
@@ -59,222 +73,96 @@ class CinematicAudioEngine {
     this.listeners.forEach((fn) => fn(s));
   }
 
-  public setVolume(vol: number) {
-    this.volume = Math.max(0, Math.min(1, vol));
-    if (this.gainNode && this.ctx) {
-      const target = this.isMuted ? 0 : this.volume * 0.3; // safe ceiling
-      this.gainNode.gain.setTargetAtTime(target, this.ctx.currentTime, 0.05);
+  /**
+   * Sets the initial 2 song suggestions for a given movie/video context.
+   */
+  public setInitialSongs(initialTracks: SoundtrackTrack[]) {
+    if (initialTracks.length >= 2) {
+      this.suggestions = initialTracks.slice(0, 2);
+    } else if (initialTracks.length === 1) {
+      const first = initialTracks[0];
+      const secondId = first.similarSongIds?.[0] || 'st_piaf';
+      const second = ALL_SEMANTIC_SONGS[secondId] || ALL_SEMANTIC_SONGS.st_piaf;
+      this.suggestions = [first, second];
+    } else {
+      this.suggestions = [ALL_SEMANTIC_SONGS.st_time, ALL_SEMANTIC_SONGS.st_piaf];
     }
     this.notify();
   }
 
-  public toggleMute() {
-    this.isMuted = !this.isMuted;
-    this.setVolume(this.volume);
-  }
+  /**
+   * Plays a selected song and immediately updates the 2 suggestions with similarity to it.
+   */
+  public selectAndPlaySong(song: SoundtrackTrack) {
+    this.currentSong = song;
+    this.isPlaying = true;
 
-  public stop() {
-    if (this.timerId) {
-      window.clearInterval(this.timerId);
-      this.timerId = null;
+    // Dynamically calculate 2 similar songs to this selected song
+    const similarIds = song.similarSongIds || [];
+    const nextSuggestions: SoundtrackTrack[] = [];
+
+    for (const sid of similarIds) {
+      if (ALL_SEMANTIC_SONGS[sid] && ALL_SEMANTIC_SONGS[sid].id !== song.id) {
+        nextSuggestions.push(ALL_SEMANTIC_SONGS[sid]);
+      }
+      if (nextSuggestions.length === 2) break;
     }
-    for (const node of this.oscillators) {
-      try {
-        if ('stop' in node && typeof (node as OscillatorNode).stop === 'function') {
-          (node as OscillatorNode).stop();
+
+    // Fallback if less than 2
+    if (nextSuggestions.length < 2) {
+      for (const key of Object.keys(ALL_SEMANTIC_SONGS)) {
+        const candidate = ALL_SEMANTIC_SONGS[key];
+        if (candidate.id !== song.id && !nextSuggestions.some((s) => s.id === candidate.id)) {
+          nextSuggestions.push(candidate);
         }
-        node.disconnect();
-      } catch {
-        // already disconnected
+        if (nextSuggestions.length === 2) break;
       }
     }
-    this.oscillators = [];
-    this.isPlaying = false;
-    this.notify();
-  }
 
-  public playPreset(preset: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow') {
-    this.activePreset = preset;
-    const ctx = this.getContext();
+    this.suggestions = nextSuggestions.slice(0, 2);
 
-    this.stop();
-
-    const masterGain = ctx.createGain();
-    const targetVol = this.isMuted ? 0 : this.volume * 0.3;
-    masterGain.gain.setValueAtTime(targetVol, ctx.currentTime);
-    masterGain.connect(ctx.destination);
-    this.gainNode = masterGain;
-
-    if (preset === 'noir_drone') {
-      this.createNoirDrone(ctx, masterGain);
-    } else if (preset === 'scifi_synth') {
-      this.createSciFiSynth(ctx, masterGain);
-    } else if (preset === 'tension_strings') {
-      this.createTensionStrings(ctx, masterGain);
-    } else if (preset === 'lofi_tape') {
-      this.createLoFiTape(ctx, masterGain);
-    } else {
-      this.createOrchestralGlow(ctx, masterGain);
+    // Send command to offscreen player
+    if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({
+        type: 'PLAY_SONG',
+        song: {
+          id: song.id,
+          title: song.title,
+          artist: song.composer,
+          mood: song.mood,
+          melodyStyle: song.melodyStyle,
+        },
+        volume: this.volume,
+      }).catch(() => {});
     }
 
-    this.isPlaying = true;
     this.notify();
   }
 
-  public togglePlay(preset?: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow') {
+  public togglePlay() {
     if (this.isPlaying) {
       this.stop();
     } else {
-      this.playPreset(preset || (this.activePreset as any) || 'noir_drone');
+      const toPlay = this.currentSong || this.suggestions[0] || ALL_SEMANTIC_SONGS.st_time;
+      this.selectAndPlaySong(toPlay);
     }
   }
 
-  // ── Preset Synthesizers ──────────────────────────────────────────────────
-
-  private createNoirDrone(ctx: AudioContext, dest: AudioNode) {
-    // D minor cinematic chord: D2 (73.4Hz), A2 (110Hz), F3 (174.6Hz), D3 (146.8Hz)
-    const freqs = [73.42, 110.0, 146.83, 174.61];
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(320, ctx.currentTime);
-    filter.connect(dest);
-
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = i === 0 ? 'triangle' : 'sine';
-      osc.frequency.setValueAtTime(f, ctx.currentTime);
-
-      // subtle detune for warm analog chorus
-      osc.detune.setValueAtTime((i - 1.5) * 4, ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.22 / (i + 1), ctx.currentTime);
-      osc.connect(gain);
-      gain.connect(filter);
-      osc.start();
-      this.oscillators.push(osc, gain);
-    });
-
-    // LFO modulation for breathing cinematic pulse
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(0.12, ctx.currentTime); // very slow 8-second swell
-    lfoGain.gain.setValueAtTime(140, ctx.currentTime);
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start();
-    this.oscillators.push(lfo, lfoGain, filter);
+  public stop() {
+    this.isPlaying = false;
+    if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({ type: 'STOP_SONG' }).catch(() => {});
+    }
+    this.notify();
   }
 
-  private createSciFiSynth(ctx: AudioContext, dest: AudioNode) {
-    // Shimmering sci-fi fifths: C3 (130.8Hz), G3 (196Hz), D4 (293.6Hz), A4 (440Hz)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'bandpass';
-    filter.frequency.setValueAtTime(450, ctx.currentTime);
-    filter.Q.setValueAtTime(1.5, ctx.currentTime);
-    filter.connect(dest);
-
-    const freqs = [130.81, 196.0, 293.66, 440.0];
-    freqs.forEach((f) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(f, ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.08, ctx.currentTime);
-      osc.connect(gain);
-      gain.connect(filter);
-      osc.start();
-      this.oscillators.push(osc, gain);
-    });
-
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(0.2, ctx.currentTime);
-    lfoGain.gain.setValueAtTime(250, ctx.currentTime);
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start();
-    this.oscillators.push(lfo, lfoGain, filter);
-  }
-
-  private createTensionStrings(ctx: AudioContext, dest: AudioNode) {
-    // Sharp suspense cluster: C#2 (69.3Hz), D2 (73.4Hz), A2 (110Hz)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(280, ctx.currentTime);
-    filter.connect(dest);
-
-    const freqs = [69.3, 73.42, 110.0, 116.54];
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'triangle';
-      osc.frequency.setValueAtTime(f, ctx.currentTime);
-      osc.detune.setValueAtTime((i % 2 === 0 ? 6 : -6), ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.18, ctx.currentTime);
-      osc.connect(gain);
-      gain.connect(filter);
-      osc.start();
-      this.oscillators.push(osc, gain);
-    });
-
-    this.oscillators.push(filter);
-  }
-
-  private createLoFiTape(ctx: AudioContext, dest: AudioNode) {
-    // Warm, sleepy electric piano warmth
-    const freqs = [110, 164.81, 196.0, 246.94]; // A - E - G - B (maj9 vibe)
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(500, ctx.currentTime);
-    filter.connect(dest);
-
-    freqs.forEach((f) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(f, ctx.currentTime);
-      gain.gain.setValueAtTime(0.12, ctx.currentTime);
-      osc.connect(gain);
-      gain.connect(filter);
-      osc.start();
-      this.oscillators.push(osc, gain);
-    });
-
-    this.oscillators.push(filter);
-  }
-
-  private createOrchestralGlow(ctx: AudioContext, dest: AudioNode) {
-    // Hans Zimmer style majestic ascending pad: F2 (87.3Hz), C3 (130.8Hz), A3 (220Hz), C4 (261.6Hz)
-    const freqs = [87.31, 130.81, 220.0, 261.63];
-    const filter = ctx.createBiquadFilter();
-    filter.type = 'lowpass';
-    filter.frequency.setValueAtTime(400, ctx.currentTime);
-    filter.connect(dest);
-
-    freqs.forEach((f, i) => {
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-      osc.type = i === 0 ? 'triangle' : 'sine';
-      osc.frequency.setValueAtTime(f, ctx.currentTime);
-      gain.gain.setValueAtTime(0.25 / (i + 1), ctx.currentTime);
-      osc.connect(gain);
-      gain.connect(filter);
-      osc.start();
-      this.oscillators.push(osc, gain);
-    });
-
-    const lfo = ctx.createOscillator();
-    const lfoGain = ctx.createGain();
-    lfo.frequency.setValueAtTime(0.08, ctx.currentTime);
-    lfoGain.gain.setValueAtTime(180, ctx.currentTime);
-    lfo.connect(lfoGain);
-    lfoGain.connect(filter.frequency);
-    lfo.start();
-    this.oscillators.push(lfo, lfoGain, filter);
+  public setVolume(vol: number) {
+    this.volume = Math.max(0, Math.min(1, vol));
+    if (typeof chrome !== 'undefined' && chrome.runtime?.sendMessage) {
+      chrome.runtime.sendMessage({ type: 'SET_VOLUME', volume: this.volume }).catch(() => {});
+    }
+    this.notify();
   }
 }
 
-export const audioEngine = new CinematicAudioEngine();
+export const audioClient = new AudioClient();
