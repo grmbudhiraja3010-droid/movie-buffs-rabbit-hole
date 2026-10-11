@@ -38,20 +38,31 @@
   padding: 0;
 }
 
-html, body {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden !important;
+/* Chrome Extension Popup Fixed Dimensions (Default) */
+html,
+body {
+  width: 580px;
+  min-width: 580px;
+  max-width: 580px;
+  height: 580px;
+  min-height: 520px;
+  max-height: 600px;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
 }
 
 body.filmy-body {
-  width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
+  width: 580px;
+  min-width: 580px;
+  max-width: 580px;
+  height: 580px;
+  min-height: 520px;
+  max-height: 600px;
   margin: 0;
   padding: 0;
-  /* Mix of different film posters wallpaper with dark atmospheric vignette */
   background-color: #0c0f17;
   background-image: linear-gradient(rgba(10, 12, 18, 0.45), rgba(10, 12, 18, 0.55)), url('/images/film-posters-bg.jpg');
   background-size: cover;
@@ -63,14 +74,27 @@ body.filmy-body {
   font-size: 13.5px;
   line-height: 1.5;
   overflow-x: hidden !important;
+  overflow-y: auto !important;
   position: relative;
   -webkit-font-smoothing: antialiased;
 }
 
+/* When expanded to full tab dashboard */
+html.mode-tab,
+body.mode-tab,
+html.mode-tab body.filmy-body {
+  width: 100% !important;
+  min-width: 100% !important;
+  max-width: 100% !important;
+  height: auto !important;
+  min-height: 100vh !important;
+  max-height: none !important;
+  overflow-y: auto !important;
+}
+
 #root {
   width: 100%;
-  max-width: 100%;
-  min-height: 100vh;
+  min-height: 100%;
   overflow-x: hidden !important;
 }
 
@@ -94,7 +118,7 @@ h1, h2, h3, h4, p, span, div, a {
   position: relative;
   z-index: 10;
   width: 100%;
-  max-width: 720px;
+  max-width: 580px;
   margin: 0 auto;
   padding: 14px 16px 40px;
   display: flex;
@@ -105,8 +129,8 @@ h1, h2, h3, h4, p, span, div, a {
 }
 
 .popup-container {
-  width: 580px;
-  max-width: 100vw;
+  width: 100%;
+  max-width: 580px;
 }
 
 .tab-mode-container {

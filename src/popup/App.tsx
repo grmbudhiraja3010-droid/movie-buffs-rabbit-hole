@@ -144,7 +144,7 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
               <span className="pulse-dot" />
               <span>
                 {context?.isWatching
-                  ? `Now Watching on ${context.platform.toUpperCase()}`
+                  ? `Now Watching on ${(context.platform || 'stream').toUpperCase()}`
                   : isMovie
                   ? 'Cinema Selection'
                   : 'Online Video Media'}
@@ -179,7 +179,7 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           {/* GENRES: Added directly in this first section per Rule 9 */}
           <div className="first-section-genres">
             <span className="genre-pill primary">🎬 {movieData.primaryGenre}</span>
-            {movieData.subgenres.map((g) => (
+            {(movieData.subgenres || []).map((g) => (
               <span key={g} className="genre-pill">
                 {g}
               </span>
@@ -204,12 +204,14 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
         </section>
 
         {/* SECTION 2: Quirky Reddit & Community Summary (Upvotes) */}
-        <QuirkySummaryCard
-          source={movieData.quirkySummary.source}
-          quote={movieData.quirkySummary.quote}
-          upvotes={movieData.quirkySummary.upvotes}
-          takeaway={movieData.quirkySummary.takeaway}
-        />
+        {movieData.quirkySummary && (
+          <QuirkySummaryCard
+            source={movieData.quirkySummary.source}
+            quote={movieData.quirkySummary.quote}
+            upvotes={movieData.quirkySummary.upvotes}
+            takeaway={movieData.quirkySummary.takeaway}
+          />
+        )}
 
         {/* CINEMA-SPECIFIC SECTIONS: Only enabled for movies when data is present */}
         {isMovie && (

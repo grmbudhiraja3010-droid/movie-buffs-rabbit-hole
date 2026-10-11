@@ -6,11 +6,26 @@
     <meta name="color-scheme" content="dark" />
     <title>Movie Buff's Rabbit Hole</title>
     <link rel="icon" type="image/png" href="/icons/icon-32.png" />
+    <!-- Critical default popup dimensions: Prevents Chrome from collapsing the popup into a thin sliver -->
+    <style>
+      html, body {
+        width: 580px;
+        min-width: 580px;
+        max-width: 580px;
+        height: 580px;
+        min-height: 520px;
+        max-height: 600px;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        overflow-x: hidden;
+      }
+    </style>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
-  <body class="filmy-body">
+  <body class="filmy-body mode-popup">
     <div id="root"></div>
     <script type="module" src="/src/popup/main.tsx"></script>
   </body>
