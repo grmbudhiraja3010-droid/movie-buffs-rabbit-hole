@@ -1,16 +1,12 @@
 import React, { useEffect, useState } from 'react';
-import { detectCurrentMovie, type ActiveContext } from '../services/contextService';
+import { detectCurrentMovie, sanitizeTitle, type ActiveContext } from '../services/contextService';
 import { getMovieData, getGeneralVideoData, CURATED_MOVIES } from '../data/movies';
 import type { MovieBuffData } from '../types/movie';
 
-import { AudioPlayerBar } from '../components/AudioPlayerBar';
-import { DepthMeter } from '../components/DepthMeter';
 import { QuirkySummaryCard } from '../components/QuirkySummaryCard';
-import { FrameAnalysisCard } from '../components/FrameAnalysisCard';
 import { ReviewsCard } from '../components/ReviewsCard';
 import { CastRabbitHole } from '../components/CastRabbitHole';
 import { DirectorsCutCard } from '../components/DirectorsCutCard';
-import { GenreTableCard } from '../components/GenreTableCard';
 import { ThematicTopicsCard } from '../components/ThematicTopicsCard';
 import { EndingExplainedCard } from '../components/EndingExplainedCard';
 import { BloopersCard } from '../components/BloopersCard';
@@ -26,23 +22,23 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
   const [context, setContext] = useState<ActiveContext | null>(null);
   const [movieData, setMovieData] = useState<MovieBuffData>(CURATED_MOVIES.inception);
   const [searchQuery, setSearchQuery] = useState('');
-  const [depthLevel, setDepthLevel] = useState(1);
 
   // Initial detection & State restoration
   useEffect(() => {
     async function load() {
       const urlParams = new URLSearchParams(window.location.search);
       const requestedMovie = urlParams.get('movie');
+      const requestedType = urlParams.get('contentType');
 
-      const detected = await detectCurrentMovie(requestedMovie);
+      const detected = await detectCurrentMovie(requestedMovie, requestedType);
       setContext(detected);
       setMovieData(detected.movieData);
 
-      // Persist active movie so future popup opens or tabs stay intact
+      // Persist active movie cleanly so future popup opens or tabs stay intact
       if (typeof chrome !== 'undefined' && chrome.storage?.local) {
         chrome.storage.local.set({
-          lastActiveMovieId: detected.movieData.id,
-          lastContentType: detected.movieData.contentType || 'movie',
+          lastActiveTitle: detected.movieData.title,
+          lastVideoType: detected.movieData.contentType || 'movie',
           lastWatchedUrl: detected.sourceUrl || '',
         });
       }
@@ -54,8 +50,8 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
     setMovieData(newData);
     if (typeof chrome !== 'undefined' && chrome.storage?.local) {
       chrome.storage.local.set({
-        lastActiveMovieId: newData.id,
-        lastContentType: newData.contentType || 'movie',
+        lastActiveTitle: newData.title,
+        lastVideoType: newData.contentType || 'movie',
       });
     }
   };
@@ -63,31 +59,31 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (!searchQuery.trim()) return;
-    const found = getMovieData(searchQuery.trim());
+    const clean = sanitizeTitle(searchQuery.trim());
+    const found = getMovieData(clean);
     updateActiveMovie(found);
     setSearchQuery('');
   };
 
   const handleMovieSelect = (title: string) => {
-    const found = getMovieData(title);
+    const clean = sanitizeTitle(title);
+    const found = getMovieData(clean);
     updateActiveMovie(found);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleToggleContentType = () => {
     if (movieData.contentType === 'general_video') {
-      // Switch to movie analysis
       const movie = getMovieData(movieData.title);
       updateActiveMovie(movie);
     } else {
-      // Switch to general video
       const gen = getGeneralVideoData(movieData.title, movieData.director);
       updateActiveMovie(gen);
     }
   };
 
   const handleOpenTab = () => {
-    const targetUrl = `popup.html?mode=tab&movie=${encodeURIComponent(movieData.id)}&contentType=${encodeURIComponent(movieData.contentType || 'movie')}`;
+    const targetUrl = `popup.html?mode=tab&movie=${encodeURIComponent(movieData.title)}&contentType=${encodeURIComponent(movieData.contentType || 'movie')}`;
     if (typeof chrome !== 'undefined' && chrome.tabs?.create) {
       void chrome.tabs.create({ url: chrome.runtime.getURL(targetUrl) });
     } else {
@@ -103,13 +99,13 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
     }
   };
 
-  const isGeneralVideo = movieData.contentType === 'general_video';
+  const isMovie = movieData.contentType !== 'general_video';
 
   return (
     <>
       <div className="filmy-atmosphere" />
 
-      <div className={`app-container ${mode === 'tab' ? 'tab-mode-container' : ''}`}>
+      <div className={`app-container ${mode === 'tab' ? 'tab-mode-container' : 'popup-container'}`}>
         {/* Cinema Header */}
         <header className="cinema-header">
           <div className="brand-section">
@@ -120,12 +116,12 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
             </div>
           </div>
 
-          <div style={{ display: 'flex', gap: '8px' }}>
+          <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             {mode === 'popup' && (
               <button
                 className="header-action-btn"
                 onClick={handleOpenTab}
-                title="Expand to Fullscreen Dashboard Tab (keeps current page intact)"
+                title="Expand to Fullscreen Dashboard Tab"
               >
                 ⤢
               </button>
@@ -140,73 +136,59 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           </div>
         </header>
 
-        {/* Content Type Identifier Bar */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#ffffff', padding: '8px 16px', borderRadius: '12px', border: '1px solid #e2e8f0' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '12.5px' }}>
-            <span style={{ fontSize: '15px' }}>{isGeneralVideo ? '📹' : '🎬'}</span>
-            <span>
-              Detected: <strong>{isGeneralVideo ? 'General Video / Online Media' : 'Cinema / Movie Title'}</strong>
+        {/* SECTION 1: FIRST SECTION — Currently Playing Film/Video Overview + Integrated Genres */}
+        <section className="first-cinema-section">
+          {/* Top Status & Mode Toggle */}
+          <div className="first-section-status-bar">
+            <div className="watching-tag">
+              <span className="pulse-dot" />
+              <span>
+                {context?.isWatching
+                  ? `Now Watching on ${context.platform.toUpperCase()}`
+                  : isMovie
+                  ? 'Cinema Selection'
+                  : 'Online Video Media'}
+              </span>
+            </div>
+
+            <button
+              onClick={handleToggleContentType}
+              className="mode-toggle-pill"
+              title="Toggle between Movie and General Video analysis mode"
+            >
+              {isMovie ? '🎬 Movie Mode' : '📹 General Video Mode'} (Switch ↗)
+            </button>
+          </div>
+
+          {/* Main Title & Core Meta */}
+          <h2 className="movie-title">{movieData.title}</h2>
+
+          <div className="movie-meta-line">
+            <span className="meta-pill">{movieData.year}</span>
+            <span>•</span>
+            <span className="meta-pill">{movieData.runtime}</span>
+            <span>•</span>
+            <span className="meta-director">
+              {isMovie ? 'Directed by ' : 'Creator: '}
+              <strong>{movieData.director}</strong>
             </span>
+            <span>•</span>
+            <span className="meta-pill">{movieData.language}</span>
           </div>
 
-          <button
-            onClick={handleToggleContentType}
-            className="filter-pill"
-            style={{ fontSize: '11px', padding: '3px 10px' }}
-          >
-            {isGeneralVideo ? 'Analyze as Movie ↗' : 'View as General Video ↗'}
-          </button>
-        </div>
-
-        {/* Audio Soundtrack Player (2 Semantic Songs with Dynamic Similarity) */}
-        <AudioPlayerBar initialTracks={movieData.soundtrack} />
-
-        {/* Rabbit Hole Depth Meter (Active for Cinema mode) */}
-        {!isGeneralVideo && (
-          <DepthMeter currentLevel={depthLevel} onSelectLevel={(lvl) => setDepthLevel(lvl)} />
-        )}
-
-        {/* Movie Hero / Playing Banner */}
-        <section className="movie-hero">
-          <div className="hero-main-row">
-            <div className="movie-poster-box">
-              <div style={{ fontSize: '36px', marginBottom: '8px' }}>{isGeneralVideo ? '📹' : '📽️'}</div>
-              <div style={{ fontSize: '11px', color: '#cbd5e1', fontWeight: 600 }}>
-                {movieData.primaryGenre}
-              </div>
-              <div style={{ fontSize: '10px', color: '#fbbf24', marginTop: '4px' }}>
-                {movieData.country}
-              </div>
-            </div>
-
-            <div className="hero-details">
-              {context?.isWatching && (
-                <div className="watching-badge">
-                  <span className="pulse-dot" />
-                  <span>Now Watching ({context.platform.toUpperCase()})</span>
-                </div>
-              )}
-
-              <h2 className="movie-title">{movieData.title}</h2>
-
-              <div className="movie-meta-line">
-                <span className="meta-pill">{movieData.year}</span>
-                <span>•</span>
-                <span className="meta-pill">{movieData.runtime}</span>
-                <span>•</span>
-                <span className="meta-director">
-                  {isGeneralVideo ? 'Creator / Channel: ' : 'Directed by '}
-                  <strong>{movieData.director}</strong>
-                </span>
-                <span>•</span>
-                <span className="meta-pill">{movieData.language}</span>
-              </div>
-
-              <p className="movie-synopsis">{movieData.synopsis}</p>
-            </div>
+          {/* GENRES: Added directly in this first section per Rule 9 */}
+          <div className="first-section-genres">
+            <span className="genre-pill primary">🎬 {movieData.primaryGenre}</span>
+            {movieData.subgenres.map((g) => (
+              <span key={g} className="genre-pill">
+                {g}
+              </span>
+            ))}
           </div>
 
-          {/* Quick Movie Search / Switcher Bar */}
+          <p className="movie-synopsis">{movieData.synopsis}</p>
+
+          {/* Quick Search / Switcher Bar */}
           <form className="search-movie-bar" onSubmit={handleSearch}>
             <input
               type="text"
@@ -221,7 +203,7 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           </form>
         </section>
 
-        {/* Quirky Community Summary */}
+        {/* SECTION 2: Quirky Reddit & Community Summary (Upvotes) */}
         <QuirkySummaryCard
           source={movieData.quirkySummary.source}
           quote={movieData.quirkySummary.quote}
@@ -229,43 +211,33 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
           takeaway={movieData.quirkySummary.takeaway}
         />
 
-        {/* CINEMA-SPECIFIC SECTIONS: Only displayed when data is available for movies */}
-        {!isGeneralVideo && (
+        {/* CINEMA-SPECIFIC SECTIONS: Only enabled for movies when data is present */}
+        {isMovie && (
           <>
             {/* Reviews Section */}
-            {movieData.reviews.length > 0 && (
+            {movieData.reviews && movieData.reviews.length > 0 && (
               <ReviewsCard reviews={movieData.reviews} ratings={movieData.ratings} />
             )}
 
-            {/* Frame Analysis: Says vs Means */}
-            {movieData.frames.length > 0 && (
-              <FrameAnalysisCard frames={movieData.frames} />
-            )}
-
-            {/* Cast Rabbit Hole */}
-            {movieData.cast.length > 0 && (
+            {/* Cast Rabbit Hole (Google-Style, max 3 filters, stable shape) */}
+            {movieData.cast && movieData.cast.length > 0 && (
               <CastRabbitHole cast={movieData.cast} />
             )}
 
-            {/* Director's Cut */}
+            {/* Director's Cut (Active links, books only if true, max 3 filters) */}
             {movieData.directorsCut?.creativeVision && (
               <DirectorsCutCard directorsCut={movieData.directorsCut} />
             )}
 
-            {/* Genre Table */}
-            {movieData.genreCatalogue.length > 0 && (
-              <GenreTableCard movieData={movieData} />
-            )}
-
-            {/* Thematic Topics */}
-            {movieData.topics.length > 0 && (
+            {/* Thematic Topics (Real core themes of the work) */}
+            {movieData.topics && movieData.topics.length > 0 && (
               <ThematicTopicsCard
                 topics={movieData.topics}
                 onSelectMovie={handleMovieSelect}
               />
             )}
 
-            {/* Ending Explained */}
+            {/* Ending Explained & Movie Bridges (Real active links) */}
             {movieData.endingExplained?.summary && (
               <EndingExplainedCard
                 ending={movieData.endingExplained}
@@ -273,18 +245,28 @@ export const App: React.FC<AppProps> = ({ mode = 'popup' }) => {
               />
             )}
 
-            {/* Bloopers & BTS Outtakes */}
-            {movieData.bloopers.length > 0 && (
+            {/* Bloopers (ONLY IF real blooper videos are available!) */}
+            {movieData.bloopers && movieData.bloopers.length > 0 && (
               <BloopersCard bloopers={movieData.bloopers} />
             )}
           </>
         )}
 
-        {/* Discussions, Fandoms, Quotes, Debates, Reddit & Substack */}
-        <DiscussionsCard discussions={movieData.discussions} />
+        {/* GENERAL VIDEO MODE: Only keep relevant thematic topics if available */}
+        {!isMovie && movieData.topics && movieData.topics.length > 0 && (
+          <ThematicTopicsCard
+            topics={movieData.topics}
+            onSelectMovie={handleMovieSelect}
+          />
+        )}
+
+        {/* Discussions, Debates, Reddit & Substack (No iconic dialogue quotes) */}
+        {movieData.discussions && (
+          <DiscussionsCard discussions={movieData.discussions} />
+        )}
 
         {/* Footer */}
-        <footer style={{ textAlign: 'center', color: '#ffffff', fontSize: '12px', marginTop: '16px', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
+        <footer style={{ textAlign: 'center', color: '#ffffff', fontSize: '11px', marginTop: '12px', textShadow: '0 1px 4px rgba(0,0,0,0.8)' }}>
           Movie Buff's Rabbit Hole • Made for cinephiles • Privacy-first
         </footer>
       </div>

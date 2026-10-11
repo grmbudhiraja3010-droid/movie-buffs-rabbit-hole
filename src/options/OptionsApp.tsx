@@ -2,8 +2,6 @@ import React, { useState } from 'react';
 import '../styles/filmy.css';
 
 export const OptionsApp: React.FC = () => {
-  const [defaultVolume, setDefaultVolume] = useState(45);
-  const [autoPlaySoundtrack, setAutoPlaySoundtrack] = useState(true);
   const [detectNetflix, setDetectNetflix] = useState(true);
   const [detectYouTube, setDetectYouTube] = useState(true);
   const [savedNotice, setSavedNotice] = useState(false);
@@ -16,7 +14,6 @@ export const OptionsApp: React.FC = () => {
   return (
     <>
       <div className="filmy-atmosphere" />
-      <div className="projector-glow" />
 
       <div className="app-container" style={{ maxWidth: '650px', paddingTop: '32px' }}>
         <header className="cinema-header">
@@ -30,56 +27,12 @@ export const OptionsApp: React.FC = () => {
         </header>
 
         <div className="rabbit-section" style={{ padding: '24px' }}>
-          <h2 style={{ fontFamily: 'var(--font-serif)', fontSize: '18px', color: 'var(--text-dark)', marginBottom: '16px' }}>
-            Soundtrack & Ambient Scores
-          </h2>
-
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Default Background Soundtrack Volume</strong>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Ambient soundtrack level when opening extension
-                </span>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <input
-                  type="range"
-                  min="0"
-                  max="100"
-                  value={defaultVolume}
-                  onChange={(e) => setDefaultVolume(Number(e.target.value))}
-                  className="volume-slider"
-                />
-                <span style={{ fontSize: '12px', color: 'var(--crimson-600)', fontWeight: 700, width: '36px' }}>{defaultVolume}%</span>
-              </div>
-            </label>
-
-            <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <div>
-                <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Auto-Play Cinematic Ambience</strong>
-                <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Subtly begin playing ambient synthesizer score when viewing film details
-                </span>
-              </div>
-              <input
-                type="checkbox"
-                checked={autoPlaySoundtrack}
-                onChange={(e) => setAutoPlaySoundtrack(e.target.checked)}
-                style={{ width: '18px', height: '18px', accentColor: '#e11d48' }}
-              />
-            </label>
-          </div>
-
           <h2
             style={{
               fontFamily: 'var(--font-serif)',
               fontSize: '18px',
               color: 'var(--text-dark)',
-              marginTop: '24px',
               marginBottom: '16px',
-              borderTop: '1px solid var(--border-light)',
-              paddingTop: '16px',
             }}
           >
             Streaming Platform Detection
@@ -90,14 +43,14 @@ export const OptionsApp: React.FC = () => {
               <div>
                 <strong style={{ color: 'var(--text-dark)', display: 'block' }}>Netflix Detection</strong>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Automatically detect titles and frames playing on netflix.com
+                  Automatically detect titles playing on netflix.com
                 </span>
               </div>
               <input
                 type="checkbox"
                 checked={detectNetflix}
                 onChange={(e) => setDetectNetflix(e.target.checked)}
-                style={{ width: '18px', height: '18px', accentColor: '#e11d48' }}
+                style={{ width: '18px', height: '18px', accentColor: '#be123c' }}
               />
             </label>
 
@@ -105,36 +58,32 @@ export const OptionsApp: React.FC = () => {
               <div>
                 <strong style={{ color: 'var(--text-dark)', display: 'block' }}>YouTube Detection</strong>
                 <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
-                  Automatically detect movie trailers and video essays on youtube.com
+                  Automatically extract video titles and trailers on youtube.com
                 </span>
               </div>
               <input
                 type="checkbox"
                 checked={detectYouTube}
                 onChange={(e) => setDetectYouTube(e.target.checked)}
-                style={{ width: '18px', height: '18px', accentColor: '#e11d48' }}
+                style={{ width: '18px', height: '18px', accentColor: '#be123c' }}
               />
             </label>
           </div>
 
-          <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <button className="search-btn" onClick={handleSave} style={{ padding: '10px 24px' }}>
-              Save Settings
+          <div style={{ marginTop: '28px', display: 'flex', alignItems: 'center', gap: '12px' }}>
+            <button
+              onClick={handleSave}
+              className="search-btn"
+              style={{ padding: '10px 24px', fontSize: '13px' }}
+            >
+              Save Preferences
             </button>
-            {savedNotice && <span style={{ color: '#4ade80', fontSize: '13px' }}>✓ Settings saved successfully!</span>}
+            {savedNotice && (
+              <span style={{ color: '#059669', fontSize: '13px', fontWeight: 600 }}>
+                ✓ Preferences saved!
+              </span>
+            )}
           </div>
-        </div>
-
-        <div style={{ textAlign: 'center', fontSize: '12px', color: '#64748b', marginTop: '16px' }}>
-          GitHub Repository:{' '}
-          <a
-            href="https://github.com/grmbudhiraja3010-droid/movie-buffs-rabbit-hole"
-            target="_blank"
-            rel="noopener noreferrer"
-            style={{ color: '#fbbf24', textDecoration: 'none' }}
-          >
-            https://github.com/grmbudhiraja3010-droid/movie-buffs-rabbit-hole
-          </a>
         </div>
       </div>
     </>

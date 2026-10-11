@@ -1,23 +1,14 @@
 import React, { useState } from 'react';
-import type { DirectorsCut, FilmographyFilter, InterviewFilter } from '../types/movie';
+import type { DirectorsCut } from '../types/movie';
 
 interface DirectorsCutCardProps {
-  directorsCut: DirectorsCut;
+  directorsCut?: DirectorsCut;
 }
 
 export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut }) => {
-  const [filmoFilter, setFilmoFilter] = useState<FilmographyFilter>('all');
-  const [interviewFilter, setInterviewFilter] = useState<InterviewFilter>('all');
+  const [activeTab, setActiveTab] = useState<'vision' | 'filmography' | 'interviews'>('vision');
 
-  const filteredFilmography = directorsCut.directorFilmography.filter((f) => {
-    if (filmoFilter === 'all') return true;
-    return f.rankCategory === filmoFilter;
-  });
-
-  const filteredInterviews = directorsCut.directorInterviews.filter((i) => {
-    if (interviewFilter === 'all') return true;
-    return i.category === interviewFilter;
-  });
+  if (!directorsCut || !directorsCut.creativeVision) return null;
 
   return (
     <div className="rabbit-section">
@@ -26,165 +17,151 @@ export const DirectorsCutCard: React.FC<DirectorsCutCardProps> = ({ directorsCut
           <span className="section-icon">🎬</span>
           <div>
             <h3 className="section-heading">Director’s Cut: Auteur Vault</h3>
-            <p style={{ fontSize: '12px', color: '#94a3b8' }}>
-              Creative vision, inspiration, pacing analysis, remakes & book adaptations
-            </p>
           </div>
         </div>
         <span className="section-badge">{directorsCut.directorName}</span>
       </div>
 
       <div className="section-body">
-        {/* Core Vision & Inspiration */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', marginTop: '4px' }}>
-          <div className="says-box" style={{ borderLeftColor: '#f59e0b' }}>
-            <span className="sub-label" style={{ color: '#fbbf24' }}>Creative Vision & Philosophy</span>
-            <p className="frame-text">{directorsCut.creativeVision}</p>
-          </div>
+        {/* Max 3 Filter Tabs */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px' }}>
+          <button
+            className={`filter-pill ${activeTab === 'vision' ? 'active' : ''}`}
+            onClick={() => setActiveTab('vision')}
+          >
+            🎯 Vision & Inspirations
+          </button>
+          <button
+            className={`filter-pill ${activeTab === 'filmography' ? 'active' : ''}`}
+            onClick={() => setActiveTab('filmography')}
+          >
+            📽️ Director Filmography
+          </button>
+          <button
+            className={`filter-pill ${activeTab === 'interviews' ? 'active' : ''}`}
+            onClick={() => setActiveTab('interviews')}
+          >
+            🎙️ Masterclasses & Talks
+          </button>
+        </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '10px' }}>
-            <div className="says-box">
-              <span className="sub-label">Inspirations & Catalysts</span>
+        {/* Vision & Inspirations Tab */}
+        {activeTab === 'vision' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+            <div className="says-box" style={{ borderLeftColor: '#f59e0b' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span className="sub-label" style={{ color: '#d97706' }}>Creative Vision</span>
+                {directorsCut.visionUrl && (
+                  <a
+                    href={directorsCut.visionUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="explore-link-btn"
+                  >
+                    Watch Video Analysis ↗
+                  </a>
+                )}
+              </div>
+              <p className="frame-text">{directorsCut.creativeVision}</p>
+            </div>
+
+            <div className="says-box" style={{ borderLeftColor: '#06b6d4' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                <span className="sub-label" style={{ color: '#0891b2' }}>Inspirations & Influences</span>
+                {directorsCut.inspirationUrl && (
+                  <a
+                    href={directorsCut.inspirationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="explore-link-btn"
+                  >
+                    Explore Influences ↗
+                  </a>
+                )}
+              </div>
               <p className="frame-text">{directorsCut.inspiration}</p>
             </div>
 
-            <div className="says-box">
-              <span className="sub-label">Pacing & Temporal Cadence</span>
-              <p className="frame-text">{directorsCut.pacingAnalysis}</p>
-            </div>
-          </div>
-
-          <div className="means-box" style={{ borderLeftColor: '#06b6d4' }}>
-            <span className="sub-label" style={{ color: '#22d3ee' }}>Scene Selection & Excised Sequences</span>
-            <p className="frame-text">{directorsCut.sceneSelectionReasoning}</p>
-          </div>
-        </div>
-
-        {/* Remake or Book Adaptation Details */}
-        <div style={{ marginTop: '14px', background: '#f8fafc', border: '1px solid var(--border-light)', borderRadius: '10px', padding: '14px' }}>
-          <span style={{ fontSize: '11px', textTransform: 'uppercase', color: 'var(--crimson-600)', fontWeight: 800, letterSpacing: '0.05em' }}>
-            Adaptation & Origin Matrix
-          </span>
-          <div style={{ marginTop: '6px', fontSize: '12.5px', color: 'var(--text-dark)' }}>
-            {directorsCut.isBasedOnBook ? (
-              <div>
-                📚 <strong>Based on Book:</strong> {directorsCut.bookTitle} by {directorsCut.bookAuthor}
-                {directorsCut.goodreadsUrl && (
-                  <div style={{ marginTop: '6px' }}>
-                    <a
-                      href={directorsCut.goodreadsUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="link-row"
-                      style={{ display: 'inline-flex', padding: '5px 12px', fontSize: '12px', color: 'var(--crimson-600)', fontWeight: 600 }}
-                    >
-                      📖 View on Goodreads & Read Reader Reviews ↗
-                    </a>
-                  </div>
-                )}
+            {/* ONLY DISPLAY BOOK SECTION IF ACTUALLY BASED ON A BOOK */}
+            {directorsCut.isBasedOnBook && directorsCut.goodreadsUrl && (
+              <div style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '12px 14px' }}>
+                <div style={{ fontSize: '11px', textTransform: 'uppercase', color: '#be123c', fontWeight: 800 }}>
+                  📚 Literary Origin (Based on Book)
+                </div>
+                <div style={{ marginTop: '4px', fontSize: '13px', color: '#0f172a' }}>
+                  <strong>{directorsCut.bookTitle}</strong> by {directorsCut.bookAuthor}
+                </div>
+                <div style={{ marginTop: '8px' }}>
+                  <a
+                    href={directorsCut.goodreadsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="link-row"
+                    style={{ display: 'inline-flex', fontSize: '12px', color: '#be123c', fontWeight: 600 }}
+                  >
+                    📖 View on Goodreads & Read Reader Reviews ↗
+                  </a>
+                </div>
                 {directorsCut.bookDivergenceNotes && (
-                  <p style={{ marginTop: '6px', fontSize: '12px', color: 'var(--text-muted)' }}>
+                  <p style={{ marginTop: '6px', fontSize: '12px', color: '#64748b' }}>
                     <strong>Adaptation Changes:</strong> {directorsCut.bookDivergenceNotes}
                   </p>
                 )}
               </div>
-            ) : directorsCut.isRemake ? (
-              <div>
-                🔄 <strong>Remake of:</strong> {directorsCut.remakeOriginalTitle}
-                <p style={{ marginTop: '4px', fontSize: '12px', color: 'var(--text-muted)' }}>
-                  {directorsCut.remakeComparison}
-                </p>
-              </div>
-            ) : (
-              <div>
-                ✨ <strong>Original Screenplay:</strong> Wholly original cinematic work not derived from prior intellectual property or remakes.
-              </div>
             )}
           </div>
-        </div>
+        )}
 
-        {/* Director Filmography */}
-        <div style={{ marginTop: '16px' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-            <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dark)' }}>
-              {directorsCut.directorName} Filmography:
-            </span>
-            <div style={{ display: 'flex', gap: '4px' }}>
-              {(['all', 'best', 'popular', 'else'] as FilmographyFilter[]).map((cat) => (
-                <button
-                  key={cat}
-                  onClick={() => setFilmoFilter(cat)}
-                  className={`filter-pill ${filmoFilter === cat ? 'active' : ''}`}
-                  style={{ fontSize: '10.5px', padding: '2px 8px' }}
-                >
-                  {cat === 'all' ? 'All' : cat === 'best' ? 'Best Rated' : cat === 'popular' ? 'Popular' : 'Other Works'}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="filmography-chips">
-            {filteredFilmography.map((work, idx) => (
-              <div key={idx} className={`filmo-chip ${work.rankCategory}`}>
-                <strong>{work.title}</strong> ({work.year}) •{' '}
-                <span style={{ color: 'var(--gold-600)', fontWeight: 600 }}>★ {work.rating}%</span>
-              </div>
+        {/* Filmography Tab */}
+        {activeTab === 'filmography' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {directorsCut.directorFilmography.map((work, idx) => (
+              <a
+                key={idx}
+                href={work.imdbUrl || `https://www.imdb.com/find/?q=${encodeURIComponent(work.title)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-row"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '10px 14px' }}
+              >
+                <div>
+                  <strong style={{ color: '#0f172a' }}>{work.title}</strong>{' '}
+                  <span style={{ color: '#64748b', fontSize: '12px' }}>({work.year})</span>
+                </div>
+                <span style={{ fontSize: '12px', color: '#be123c', fontWeight: 600 }}>
+                  ★ {work.rating}% on RT ↗
+                </span>
+              </a>
             ))}
           </div>
-        </div>
+        )}
 
-        {/* Director Interviews */}
-        {directorsCut.directorInterviews.length > 0 && (
-          <div style={{ marginTop: '16px', borderTop: '1px solid var(--border-light)', paddingTop: '12px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-              <span style={{ fontSize: '12px', fontWeight: 700, color: 'var(--text-dark)' }}>
-                Director Masterclasses & Debates:
-              </span>
-              <div style={{ display: 'flex', gap: '4px' }}>
-                {(['all', 'best', 'controversial', 'latest'] as InterviewFilter[]).map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setInterviewFilter(cat)}
-                    className={`filter-pill ${interviewFilter === cat ? 'active' : ''}`}
-                    style={{ fontSize: '10.5px', padding: '2px 8px' }}
-                  >
-                    {cat === 'all' ? 'All' : cat === 'best' ? 'Deep-Dive' : cat === 'controversial' ? 'Controversial' : 'Latest'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-              {filteredInterviews.map((item) => (
-                <a
-                  key={item.id}
-                  href={item.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    display: 'block',
-                    background: '#f8fafc',
-                    padding: '10px 12px',
-                    borderRadius: '8px',
-                    border: '1px solid var(--border-light)',
-                    borderLeft: `3px solid ${item.category === 'controversial' ? 'var(--crimson-500)' : 'var(--gold-500)'}`,
-                    textDecoration: 'none',
-                    transition: 'var(--transition-smooth)',
-                  }}
-                  className="link-row"
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12.5px', fontWeight: 700 }}>
-                    <span style={{ color: 'var(--text-dark)' }}>{item.title} ↗</span>
-                    <span style={{ color: 'var(--text-muted)', fontSize: '11px' }}>
-                      {item.source} ({item.duration})
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px' }}>
-                    {item.summary}
-                  </p>
-                </a>
-              ))}
-            </div>
+        {/* Masterclasses & Talks Tab */}
+        {activeTab === 'interviews' && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {directorsCut.directorInterviews.map((iv) => (
+              <a
+                key={iv.id}
+                href={iv.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="link-row"
+                style={{ padding: '12px 14px', display: 'flex', flexDirection: 'column', gap: '4px' }}
+              >
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '13px' }}>
+                    ▶ {iv.title}
+                  </span>
+                  <span style={{ fontSize: '11.5px', color: '#be123c', fontWeight: 600 }}>Watch ↗</span>
+                </div>
+                <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                  {iv.source} · {iv.duration}
+                </div>
+                <p style={{ fontSize: '12px', color: '#334155', marginTop: '2px' }}>
+                  {iv.summary}
+                </p>
+              </a>
+            ))}
           </div>
         )}
       </div>

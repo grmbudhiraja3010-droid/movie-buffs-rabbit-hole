@@ -1,17 +1,7 @@
 export type ReviewFilter = 'all' | 'best' | 'mid' | 'worst';
 export type ReviewSourceFilter = 'all' | 'Rotten Tomatoes' | 'IMDb' | 'Letterboxd';
-export type InterviewFilter = 'all' | 'latest' | 'best' | 'controversial' | 'fun';
-export type FilmographyFilter = 'all' | 'best' | 'popular' | 'else';
-
-export interface FrameAnalysis {
-  id: string;
-  timestamp: string;
-  sceneTitle: string;
-  says: string; // The literal dialogue / visible action
-  means: string; // The subtext, visual metaphor, psychological subversion
-  symbolismDetails: string;
-  paletteColors: string[];
-}
+export type InterviewFilter = 'all' | 'best' | 'latest';
+export type FilmographyFilter = 'all' | 'best' | 'popular';
 
 export interface ReviewItem {
   id: string;
@@ -19,7 +9,7 @@ export interface ReviewItem {
   author: string;
   publication?: string;
   score: number; // out of 5
-  starsCategory: 'best' | 'mid' | 'worst'; // best: 5/5 or 4.5/5, mid: 3/5, worst: <3
+  starsCategory: 'best' | 'mid' | 'worst';
   source: 'Rotten Tomatoes' | 'IMDb' | 'Letterboxd' | 'Roger Ebert';
   text: string;
   sentiment: 'Rave' | 'Favorable' | 'Mixed' | 'Unforgiving';
@@ -30,7 +20,7 @@ export interface InterviewItem {
   id: string;
   title: string;
   source: string;
-  category: 'latest' | 'best' | 'controversial' | 'fun';
+  category: 'latest' | 'best';
   url: string;
   duration: string;
   summary: string;
@@ -43,6 +33,7 @@ export interface FilmographyWork {
   popularScore: number; // 1-100
   rankCategory: 'best' | 'popular' | 'else';
   characterOrRole?: string;
+  imdbUrl?: string;
 }
 
 export interface CastMember {
@@ -50,6 +41,7 @@ export interface CastMember {
   character: string;
   tier: 'lead' | 'supporting' | 'cameo';
   avatarInitials: string;
+  photoUrl?: string;
   filmography: FilmographyWork[];
   interviews: InterviewItem[];
 }
@@ -57,7 +49,9 @@ export interface CastMember {
 export interface DirectorsCut {
   directorName: string;
   creativeVision: string;
+  visionUrl?: string;
   inspiration: string;
+  inspirationUrl?: string;
   pacingAnalysis: string;
   sceneSelectionReasoning: string;
   isRemake: boolean;
@@ -76,11 +70,13 @@ export interface ThematicTopic {
   name: string;
   description: string;
   relevanceReason: string;
+  exploreUrl?: string;
   otherLandmarkMovies: {
     title: string;
     year: number;
     director: string;
     connection: string;
+    exploreUrl?: string;
   }[];
 }
 
@@ -90,6 +86,7 @@ export interface SimilarMovie {
   director: string;
   rating: number;
   pitch: string;
+  exploreUrl?: string;
 }
 
 export interface OppositeMovie {
@@ -98,6 +95,7 @@ export interface OppositeMovie {
   director: string;
   rating: number;
   contrastReason: string;
+  exploreUrl?: string;
 }
 
 export interface BlooperItem {
@@ -106,21 +104,16 @@ export interface BlooperItem {
   type: 'funny' | 'dramatic';
   description: string;
   timestamp?: string;
-}
-
-export interface DiscussionQuote {
-  quote: string;
-  speaker: string;
-  sceneContext: string;
-  culturalUse: string;
+  videoUrl?: string;
 }
 
 export interface DebateControversy {
   topic: string;
-  relevancyScore: number; // 0-100
+  relevancyScore: number;
   latestDate: string;
   summary: string;
   fanbaseSides: string;
+  exploreUrl?: string;
 }
 
 export interface RedditDiscussion {
@@ -139,17 +132,6 @@ export interface SubstackEssay {
   url: string;
   readTime: string;
   snippet: string;
-}
-
-export interface SoundtrackTrack {
-  id: string;
-  title: string;
-  composer: string;
-  mood: string;
-  melodyStyle: 'time_crescendo' | 'piaf_waltz' | 'soju_piano' | 'belt_baroque' | 'oppenheimer_strings' | 'trinity_tension' | 'interstellar_organ' | 'cinema_noir_jazz' | 'cyberpunk_synth' | 'lofi_acoustic';
-  similarityTags: string[];
-  similarSongIds: string[];
-  audioPreset?: 'noir_drone' | 'scifi_synth' | 'tension_strings' | 'lofi_tape' | 'orchestral_glow';
 }
 
 export interface MovieBuffData {
@@ -182,29 +164,21 @@ export interface MovieBuffData {
     upvotes: number;
     takeaway: string;
   };
-  frames: FrameAnalysis[];
   reviews: ReviewItem[];
   cast: CastMember[];
-  directorsCut: DirectorsCut;
+  directorsCut?: DirectorsCut;
   topics: ThematicTopic[];
-  genreCatalogue: {
-    genre: string;
-    country: string;
-    language: string;
-    topRatedTitles: { title: string; year: number; rtScore: number; imdbScore: number }[];
-  }[];
-  endingExplained: {
+  endingExplained?: {
     summary: string;
     theories: string[];
+    theoryUrls?: { theory: string; url: string }[];
     similarMovies: SimilarMovie[];
     oppositeMovies: OppositeMovie[];
   };
   bloopers: BlooperItem[];
   discussions: {
-    quotes: DiscussionQuote[];
     debates: DebateControversy[];
     redditThreads: RedditDiscussion[];
     substackEssays: SubstackEssay[];
   };
-  soundtrack: SoundtrackTrack[];
 }

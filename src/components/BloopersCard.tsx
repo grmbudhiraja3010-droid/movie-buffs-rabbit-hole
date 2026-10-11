@@ -8,6 +8,9 @@ interface BloopersCardProps {
 export const BloopersCard: React.FC<BloopersCardProps> = ({ bloopers }) => {
   const [activeType, setActiveType] = useState<'all' | 'funny' | 'dramatic'>('all');
 
+  // Rule 12: DO NOT ADD BLOOPERS IF NOT AVAILABLE
+  if (!bloopers || bloopers.length === 0) return null;
+
   const filtered = bloopers.filter((b) => {
     if (activeType === 'all') return true;
     return b.type === activeType;
@@ -20,16 +23,14 @@ export const BloopersCard: React.FC<BloopersCardProps> = ({ bloopers }) => {
           <span className="section-icon">🎪</span>
           <div>
             <h3 className="section-heading">Bloopers & BTS Outtakes</h3>
-            <p style={{ fontSize: '12px', color: '#94a3b8' }}>
-              Funny corpsing & unscripted laughter vs. dramatic on-set hazards
-            </p>
           </div>
         </div>
-        <span className="section-badge">{bloopers.length} Outtakes</span>
+        <span className="section-badge">{bloopers.length} Real Outtakes</span>
       </div>
 
       <div className="section-body">
-        <div style={{ display: 'flex', gap: '8px', margin: '4px 0 12px' }}>
+        {/* Max 3 Filter Pills */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '12px' }}>
           <button
             className={`filter-pill ${activeType === 'all' ? 'active' : ''}`}
             onClick={() => setActiveType('all')}
@@ -40,13 +41,13 @@ export const BloopersCard: React.FC<BloopersCardProps> = ({ bloopers }) => {
             className={`filter-pill ${activeType === 'funny' ? 'active' : ''}`}
             onClick={() => setActiveType('funny')}
           >
-            😂 Funny / Props & Corpsing
+            😂 Funny Gag Reels
           </button>
           <button
             className={`filter-pill ${activeType === 'dramatic' ? 'active' : ''}`}
             onClick={() => setActiveType('dramatic')}
           >
-            ⚡ Dramatic / Intense Hazards
+            ⚡ On-Set Hazards
           </button>
         </div>
 
@@ -58,23 +59,25 @@ export const BloopersCard: React.FC<BloopersCardProps> = ({ bloopers }) => {
                 background: '#f8fafc',
                 padding: '12px 14px',
                 borderRadius: '8px',
-                border: '1px solid var(--border-light)',
-                borderLeft: `3px solid ${item.type === 'funny' ? 'var(--gold-500)' : 'var(--crimson-500)'}`,
-                borderLeftWidth: '3px',
+                border: '1px solid #e2e8f0',
               }}
             >
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-dark)' }}>
+                <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '13.5px' }}>
                   {item.title}
                 </span>
-                <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
-                  {item.timestamp ? `Scene: ${item.timestamp}` : ''} •{' '}
-                  <strong style={{ color: item.type === 'funny' ? 'var(--gold-600)' : 'var(--crimson-600)' }}>
-                    {item.type.toUpperCase()}
-                  </strong>
-                </span>
+                {item.videoUrl && (
+                  <a
+                    href={item.videoUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="explore-link-btn"
+                  >
+                    Watch Real Video ↗
+                  </a>
+                )}
               </div>
-              <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '4px', lineHeight: '1.45' }}>
+              <p style={{ fontSize: '12px', color: '#334155', marginTop: '4px' }}>
                 {item.description}
               </p>
             </div>

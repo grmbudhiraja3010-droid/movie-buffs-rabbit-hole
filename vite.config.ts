@@ -19,7 +19,6 @@ export default defineConfig(({ mode }) => ({
       input: {
         popup: fromRoot('popup.html'),
         options: fromRoot('options.html'),
-        offscreen: fromRoot('offscreen.html'),
         background: fromRoot('src/background/index.ts'),
       },
       output: {

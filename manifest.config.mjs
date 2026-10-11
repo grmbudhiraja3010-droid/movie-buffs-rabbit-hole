@@ -48,7 +48,6 @@ export function createManifest({ dev = false } = {}) {
       'storage',
       'activeTab',
       'tabs',
-      'offscreen',
     ],
     host_permissions: [
       'https://www.youtube.com/*',

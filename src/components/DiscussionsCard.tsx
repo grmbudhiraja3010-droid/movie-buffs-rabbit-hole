@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import type { DiscussionQuote, DebateControversy, RedditDiscussion, SubstackEssay } from '../types/movie';
+import type { DebateControversy, RedditDiscussion, SubstackEssay } from '../types/movie';
 
 interface DiscussionsCardProps {
   discussions: {
-    quotes: DiscussionQuote[];
     debates: DebateControversy[];
     redditThreads: RedditDiscussion[];
     substackEssays: SubstackEssay[];
@@ -11,15 +10,10 @@ interface DiscussionsCardProps {
 }
 
 export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions }) => {
-  const [activeTab, setActiveTab] = useState<'quotes' | 'debates' | 'reddit' | 'substack'>('quotes');
-  const [debateSort, setDebateSort] = useState<'relevancy' | 'latest'>('relevancy');
+  // Max 3 tabs, dialogue/quotes removed per Instruction 13
+  const [activeTab, setActiveTab] = useState<'debates' | 'reddit' | 'substack'>('debates');
 
-  const sortedDebates = [...discussions.debates].sort((a, b) => {
-    if (debateSort === 'relevancy') {
-      return b.relevancyScore - a.relevancyScore;
-    }
-    return b.latestDate.localeCompare(a.latestDate);
-  });
+  if (!discussions) return null;
 
   return (
     <div className="rabbit-section">
@@ -27,24 +21,15 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
         <div className="section-trigger-title">
           <span className="section-icon">💬</span>
           <div>
-            <h3 className="section-heading">Cultural Impact, Quotes & Discourse</h3>
-            <p style={{ fontSize: '12px', color: '#94a3b8' }}>
-              Iconic quotes, debates ordered by relevancy, plus Reddit & Substack essays
-            </p>
+            <h3 className="section-heading">Community Discussions & Discourse</h3>
           </div>
         </div>
-        <span className="section-badge">Fandoms & Debates</span>
+        <span className="section-badge">Discussions</span>
       </div>
 
       <div className="section-body">
-        {/* Navigation Tabs */}
-        <div style={{ display: 'flex', gap: '8px', margin: '4px 0 14px', flexWrap: 'wrap' }}>
-          <button
-            className={`filter-pill ${activeTab === 'quotes' ? 'active' : ''}`}
-            onClick={() => setActiveTab('quotes')}
-          >
-            “ ” Iconic Dialogue Quotes
-          </button>
+        {/* Navigation Tabs - Exactly 3 tabs */}
+        <div style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
           <button
             className={`filter-pill ${activeTab === 'debates' ? 'active' : ''}`}
             onClick={() => setActiveTab('debates')}
@@ -55,7 +40,7 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
             className={`filter-pill ${activeTab === 'reddit' ? 'active' : ''}`}
             onClick={() => setActiveTab('reddit')}
           >
-            🔥 Reddit Discussions ({discussions.redditThreads.length})
+            🔥 Reddit Threads ({discussions.redditThreads.length})
           </button>
           <button
             className={`filter-pill ${activeTab === 'substack' ? 'active' : ''}`}
@@ -65,154 +50,96 @@ export const DiscussionsCard: React.FC<DiscussionsCardProps> = ({ discussions })
           </button>
         </div>
 
-        {/* Quotes Tab */}
-        {activeTab === 'quotes' && (
+        {/* Debates Tab */}
+        {activeTab === 'debates' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-            {discussions.quotes.map((q, idx) => (
+            {discussions.debates.map((d, idx) => (
               <div
                 key={idx}
                 style={{
                   background: '#f8fafc',
                   padding: '12px 14px',
                   borderRadius: '8px',
-                  borderLeft: '3px solid var(--gold-500)',
-                  border: '1px solid var(--border-light)',
-                  borderLeftWidth: '3px',
+                  border: '1px solid #e2e8f0',
                 }}
               >
-                <div style={{ fontSize: '14px', fontStyle: 'italic', color: 'var(--text-dark)', fontWeight: 600 }}>
-                  "{q.quote}"
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '13.5px' }}>
+                    {d.topic}
+                  </span>
+                  {d.exploreUrl && (
+                    <a
+                      href={d.exploreUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="explore-link-btn"
+                    >
+                      Explore Debate ↗
+                    </a>
+                  )}
                 </div>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '6px', fontSize: '11.5px', color: 'var(--text-muted)' }}>
-                  <span>Spoken by: <strong style={{ color: 'var(--text-dark)' }}>{q.speaker}</strong></span>
-                  <span>{q.sceneContext}</span>
-                </div>
-                <div style={{ fontSize: '11px', color: 'var(--text-body)', marginTop: '4px' }}>
-                  <strong>Cultural Use:</strong> {q.culturalUse}
+                <p style={{ fontSize: '12.5px', color: '#334155', marginTop: '4px', lineHeight: '1.4' }}>
+                  {d.summary}
+                </p>
+                <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '6px' }}>
+                  <strong>Sides:</strong> {d.fanbaseSides}
                 </div>
               </div>
             ))}
           </div>
         )}
 
-        {/* Debates Tab */}
-        {activeTab === 'debates' && (
-          <div>
-            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '6px', marginBottom: '10px' }}>
-              <span style={{ fontSize: '11px', color: '#94a3b8', alignSelf: 'center' }}>Sort By:</span>
-              <button
-                className={`filter-pill ${debateSort === 'relevancy' ? 'active' : ''}`}
-                style={{ fontSize: '10.5px', padding: '2px 8px' }}
-                onClick={() => setDebateSort('relevancy')}
-              >
-                Highest Relevancy Score
-              </button>
-              <button
-                className={`filter-pill ${debateSort === 'latest' ? 'active' : ''}`}
-                style={{ fontSize: '10.5px', padding: '2px 8px' }}
-                onClick={() => setDebateSort('latest')}
-              >
-                Latest Discussion Date
-              </button>
-            </div>
-
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-              {sortedDebates.map((d, idx) => (
-                <div
-                  key={idx}
-                  style={{
-                    background: '#f8fafc',
-                    padding: '12px 14px',
-                    borderRadius: '8px',
-                    borderLeft: '3px solid var(--crimson-500)',
-                    border: '1px solid var(--border-light)',
-                    borderLeftWidth: '3px',
-                  }}
-                >
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '13.5px', fontWeight: 700, color: 'var(--text-dark)' }}>
-                      {d.topic}
-                    </span>
-                    <span
-                      style={{
-                        fontSize: '11px',
-                        background: '#fff1f2',
-                        color: 'var(--crimson-600)',
-                        padding: '2px 8px',
-                        borderRadius: '4px',
-                        fontWeight: 600,
-                      }}
-                    >
-                      Relevancy: {d.relevancyScore}% • {d.latestDate}
-                    </span>
-                  </div>
-                  <p style={{ fontSize: '12.5px', color: 'var(--text-body)', marginTop: '6px', lineHeight: '1.45' }}>
-                    {d.summary}
-                  </p>
-                  <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '6px' }}>
-                    <strong>Fanbase Divisions:</strong> {d.fanbaseSides}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Reddit Threads Tab */}
+        {/* Reddit Tab */}
         {activeTab === 'reddit' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {discussions.redditThreads.map((thread, idx) => (
+            {discussions.redditThreads.map((t, idx) => (
               <a
                 key={idx}
-                href={thread.url}
+                href={t.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="link-row"
+                style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 14px' }}
               >
                 <div>
-                  <div style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{thread.title}</div>
-                  <div style={{ fontSize: '11px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                    {thread.subreddit} • ▲ {thread.upvotes.toLocaleString()} upvotes • 💬 {thread.commentsCount} comments
+                  <div style={{ fontWeight: 700, color: '#0f172a', fontSize: '13px' }}>
+                    {t.title}
+                  </div>
+                  <div style={{ fontSize: '11.5px', color: '#64748b', marginTop: '3px' }}>
+                    {t.subreddit} · ▲ {(t.upvotes / 1000).toFixed(1)}k upvotes · {t.commentsCount} comments
                   </div>
                 </div>
-                <span
-                  style={{
-                    fontSize: '10.5px',
-                    padding: '2px 8px',
-                    borderRadius: '99px',
-                    background: thread.tag === 'Hot' ? 'rgba(239, 68, 68, 0.2)' : 'rgba(245, 158, 11, 0.2)',
-                    color: thread.tag === 'Hot' ? '#f87171' : '#fbbf24',
-                    fontWeight: 600,
-                  }}
-                >
-                  {thread.tag} ↗
+                <span style={{ fontSize: '11.5px', color: '#be123c', fontWeight: 600 }}>
+                  View on Reddit ↗
                 </span>
               </a>
             ))}
           </div>
         )}
 
-        {/* Substack Essays Tab */}
+        {/* Substack Tab */}
         {activeTab === 'substack' && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-            {discussions.substackEssays.map((essay, idx) => (
+            {discussions.substackEssays.map((e, idx) => (
               <a
                 key={idx}
-                href={essay.url}
+                href={e.url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="link-row"
-                style={{ flexDirection: 'column', alignItems: 'flex-start' }}
+                style={{ display: 'flex', flexDirection: 'column', gap: '4px', padding: '12px 14px' }}
               >
-                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                  <span style={{ fontWeight: 700, color: 'var(--text-dark)' }}>{essay.title}</span>
-                  <span style={{ fontSize: '11px', color: 'var(--crimson-600)', fontWeight: 600 }}>{essay.readTime} ↗</span>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <span style={{ fontWeight: 700, color: '#0f172a', fontSize: '13px' }}>
+                    {e.title}
+                  </span>
+                  <span style={{ fontSize: '11.5px', color: '#be123c', fontWeight: 600 }}>Read ↗</span>
                 </div>
-                <div style={{ fontSize: '11.5px', color: 'var(--text-muted)', marginTop: '2px' }}>
-                  by {essay.author} in <em>{essay.publication}</em>
+                <div style={{ fontSize: '11.5px', color: '#64748b' }}>
+                  {e.publication} · by {e.author} ({e.readTime})
                 </div>
-                <p style={{ fontSize: '12px', color: 'var(--text-body)', marginTop: '4px', fontStyle: 'italic' }}>
-                  "{essay.snippet}"
+                <p style={{ fontSize: '12px', color: '#334155', marginTop: '2px' }}>
+                  {e.snippet}
                 </p>
               </a>
             ))}
